@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Festa della Carteria 2026 — Cruscotto</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --rosso: #c0392b;
+    --rosso-scuro: #96281b;
+    --verde: #1a7a4a;
+    --verde-chiaro: #e8f5ee;
+    --oro: #c9902a;
+    --oro-chiaro: #fdf3e0;
+    --grigio-bg: #f5f3ef;
+    --grigio-card: #ffffff;
+    --grigio-testo: #2c2c2c;
+    --grigio-muted: #7a7570;
+    --bordo: #e0dbd3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--grigio-bg);
+    color: var(--grigio-testo);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--rosso);
+    color: white;
+    padding: 2rem 2.5rem 1.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    line-height: 1.1;
+    font-weight: 400;
+  }
+  header h1 span {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 4px;
+  }
+  .header-right {
+    text-align: right;
+    font-size: 0.78rem;
+    opacity: 0.85;
+    line-height: 1.6;
+  }
+  #last-update { font-weight: 600; }
+
+  .btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: white;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-refresh:hover { background: rgba(255,255,255,0.28); }
+  .btn-refresh.loading svg { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  main { padding: 2rem 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+  .nota {
+    background: var(--oro-chiaro);
+    border-left: 3px solid var(--oro);
+    border-radius: 4px;
+    padding: 0.7rem 1rem;
+    font-size: 0.82rem;
+    color: #6b4c10;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .sezione-titolo {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grigio-muted);
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sezione-titolo::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--bordo);
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 0.5rem;
+  }
+  .kpi {
+    background: var(--grigio-card);
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+    padding: 1.1rem 1.2rem;
+  }
+  .kpi-label {
+    font-size: 0.75rem;
+    color: var(--grigio-muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .kpi-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    color: var(--grigio-testo);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .kpi-diff {
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+  .kpi-diff.pos { color: var(--verde); }
+  .kpi-diff.neg { color: var(--rosso); }
+  .kpi-diff.neu { color: var(--grigio-muted); }
+
+  .kpi.highlight {
+    border-color: var(--verde);
+    background: var(--verde-chiaro);
+  }
+  .kpi.highlight .kpi-value { color: var(--verde-scuro, #155d38); }
+
+  .chart-card {
+    background: var(--grigio-card);
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.2rem;
+  }
+  .chart-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--grigio-muted);
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+  }
+  .legend {
+    display: flex;
+    gap: 18px;
+    font-size: 0.75rem;
+    color: var(--grigio-muted);
+    margin-bottom: 10px;
+  }
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  .giorni-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin-top: 0.5rem;
+  }
+  .giorni-table th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--grigio-muted);
+    text-align: right;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--bordo);
+  }
+  .giorni-table th:first-child { text-align: left; }
+  .giorni-table td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--bordo);
+    font-variant-numeric: tabular-nums;
+  }
+  .giorni-table td:first-child { text-align: left; font-weight: 500; }
+  .giorni-table tr:last-child td { border-bottom: none; }
+  .giorni-table tr.totale td {
+    font-weight: 600;
+    background: var(--grigio-bg);
+    border-top: 2px solid var(--bordo);
+  }
+  .giorni-table .diff-pos { color: var(--verde); font-weight: 500; }
+  .giorni-table .diff-neg { color: var(--rosso); font-weight: 500; }
+  .giorni-table .chiusi { color: var(--bordo); font-style: italic; }
+
+  .error-msg {
+    background: #fdecea;
+    border: 1px solid #f5c6c3;
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    color: #a0281e;
+    font-size: 0.85rem;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--grigio-muted);
+    padding: 2rem;
+    border-top: 1px solid var(--bordo);
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>Festa della</span>Carteria 2026</h1>
+  <div class="header-right">
+    <div>Aggiornamento: <span id="last-update">—</span></div>
+    <div id="giorni-count" style="font-size:0.72rem; opacity:0.75;"></div>
+    <button class="btn-refresh" id="btnRefresh" onclick="caricaDati()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Aggiorna
+    </button>
+  </div>
+</header>
+
+<main>
+  <div id="contenuto">
+    <div style="text-align:center; padding:3rem; color: var(--grigio-muted);">
+      <div style="font-size:1.1rem; margin-bottom:0.5rem;">Caricamento dati...</div>
+      <div style="font-size:0.8rem;">Connessione a Google Sheets in corso</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Cruscotto Festa della Carteria · Dati aggiornati in tempo reale dal foglio Google Sheets
+</footer>
+
+<script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxvPw7GkLWP0FxkBID3tHQe1acQ94dxCM27OAuq0br29_P39VNF9GqsuUZbt3R7hFmycPk1G4Urv9H/pub?gid=2124551819&single=true&output=csv&t=' + Date.now();
+
+let chartInstances = [];
+
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const row = [];
+    let inQ = false, cell = '';
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { row.push(cell.trim()); cell = ''; }
+      else { cell += c; }
+    }
+    row.push(cell.trim());
+    rows.push(row);
+  }
+  return rows;
+}
+
+function num(v) {
+  if (!v || v === '' || v === '#REF!' || v === '#N/A' || v.toLowerCase() === 'chiusi') return null;
+  const n = parseFloat(v.replace(',', '.').replace(/[^\d.\-]/g, ''));
+  return isNaN(n) ? null : n;
+}
+
+function fmtEuro(v) {
+  if (v === null || v === undefined) return '—';
+  return '€ ' + v.toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function fmtEuro2(v) {
+  if (v === null || v === undefined) return '—';
+  return '€ ' + v.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtNum(v) {
+  if (v === null || v === undefined) return '—';
+  return v.toLocaleString('it-IT');
+}
+function diffClass(v) {
+  if (v === null) return '';
+  return v > 0 ? 'diff-pos' : v < 0 ? 'diff-neg' : '';
+}
+function diffStr(v, fmt) {
+  if (v === null || v === undefined) return '—';
+  const s = fmt(Math.abs(v));
+  return (v > 0 ? '▲ +' : v < 0 ? '▼ ' : '') + s;
+}
+
+function formatData(rawDate) {
+  if (!rawDate) return rawDate;
+  // prova a parsare come data
+  const d = new Date(rawDate);
+  if (!isNaN(d)) {
+    return d.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+  return rawDate;
+}
+
+async function caricaDati() {
+  const btn = document.getElementById('btnRefresh');
+  btn.classList.add('loading');
+
+  try {
+    const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRxvPw7GkLWP0FxkBID3tHQe1acQ94dxCM27OAuq0br29_P39VNF9GqsuUZbt3R7hFmycPk1G4Urv9H/pub?gid=2124551819&single=true&output=csv&nocache=${Date.now()}`;
+    const res = await fetch(csvUrl);
+    if (!res.ok) throw new Error('Errore HTTP ' + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    renderDashboard(rows);
+    document.getElementById('last-update').textContent = new Date().toLocaleTimeString('it-IT');
+  } catch(e) {
+    document.getElementById('contenuto').innerHTML = `<div class="error-msg">
+      <strong>Impossibile caricare i dati.</strong><br>
+      Verifica la connessione o che il foglio sia ancora pubblicato sul web.<br>
+      <small style="opacity:0.7;">${e.message}</small>
+    </div>`;
+  }
+  btn.classList.remove('loading');
+}
+
+function renderDashboard(rows) {
+  // Struttura foglio: headers in riga 8 (indice 7), dati da riga 9 (indice 8)
+  // Colonne: B=data, C=2024, D=2025, E=2026, F=diff, G=prog2026, H=progDiff
+  //          J=data, K=2024cop, L=2025cop, M=2026cop, N=diffCop
+  //          S=2025scontrino, T=2026scontrino, U=diffScontrino
+  //          W=2025osteria, X=2026osteria, Y=diffOsteria
+
+  const giorni = [];
+  let totale2025 = 0, totale2026 = 0;
+  let totCop2025 = 0, totCop2026 = 0;
+  let ost2025 = 0, ost2026 = 0;
+  let countScontrino = 0, sumScont2025 = 0, sumScont2026 = 0;
+
+  for (let i = 8; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.length < 5) continue;
+    const rawData = r[1];
+    if (!rawData || rawData === '' || rawData.toLowerCase().includes('totale') || rawData.toLowerCase().includes('nel 2025')) continue;
+
+    const inc2025 = num(r[3]);
+    const inc2026 = num(r[4]);
+    const cop2025 = num(r[11]);
+    const cop2026 = num(r[12]);
+    const sc2025 = num(r[19]);
+    const sc2026 = num(r[20]);
+    const o2025 = num(r[23]);
+    const o2026 = num(r[24]);
+
+    const giorno = {
+      data: rawData.includes('/') ? rawData : formatData(rawData),
+      chiusi: rawData.toLowerCase().includes('chiusi') || r[4] === 'chiusi' || (inc2025 === null && inc2026 === null && rawData !== ''),
+      inc2025, inc2026,
+      diffInc: (inc2026 !== null && inc2025 !== null) ? inc2026 - inc2025 : null,
+      cop2025, cop2026,
+      diffCop: (cop2026 !== null && cop2025 !== null) ? cop2026 - cop2025 : null,
+      sc2025, sc2026,
+      o2025, o2026
+    };
+
+    giorni.push(giorno);
+
+    if (inc2025 !== null) totale2025 += inc2025;
+    if (inc2026 !== null) totale2026 += inc2026;
+    if (cop2025 !== null) totCop2025 += cop2025;
+    if (cop2026 !== null) totCop2026 += cop2026;
+    if (o2025 !== null) ost2025 += o2025;
+    if (o2026 !== null) ost2026 += o2026;
+    if (sc2025 !== null && sc2026 !== null) { sumScont2025 += sc2025; sumScont2026 += sc2026; countScontrino++; }
+  }
+
+  const diffTotale = totale2026 - totale2025;
+  const diffCop = totCop2026 - totCop2025;
+  const scMedio2025 = countScontrino > 0 ? sumScont2025 / countScontrino : null;
+  const scMedio2026 = countScontrino > 0 ? sumScont2026 / countScontrino : null;
+  const diffSc = (scMedio2025 && scMedio2026) ? scMedio2026 - scMedio2025 : null;
+  const diffOst = ost2026 - ost2025;
+
+  const giorniAperti2026 = giorni.filter(g => g.inc2026 !== null && !g.chiusi).length;
+  document.getElementById('giorni-count').textContent = `${giorniAperti2026} giorni con dati 2026`;
+
+  // Distruggi chart precedenti
+  chartInstances.forEach(c => c.destroy());
+  chartInstances = [];
+
+  const c2025col = '#96281b';
+  const c2026col = '#1a7a4a';
+  const gridCol = 'rgba(0,0,0,0.06)';
+  const textCol = '#7a7570';
+
+  // Giorni con dati per i grafici (almeno un anno ha dati)
+  const giorniGrafico = giorni.filter(g => g.inc2025 !== null || g.inc2026 !== null);
+  const labelsG = giorniGrafico.map(g => g.data);
+
+  const html = `
+    <div class="nota">
+      ⚠️ Nel 2025 la festa è durata una settimana in più — i dati 2025 mostrati si riferiscono ai soli giorni equivalenti.
+      I giorni con incasso 2026 ancora vuoto non sono ancora stati inseriti nel foglio.
+    </div>
+
+    <div class="sezione-titolo">Riepilogo progressivo</div>
+    <div class="kpi-grid">
+      <div class="kpi ${diffTotale >= 0 ? 'highlight' : ''}">
+        <div class="kpi-label">Incassi 2026 (progressivo)</div>
+        <div class="kpi-value">${fmtEuro(totale2026)}</div>
+        <div class="kpi-diff ${diffTotale >= 0 ? 'pos' : 'neg'}">${diffStr(diffTotale, fmtEuro)} vs 2025</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Incassi 2025 (stessa finestra)</div>
+        <div class="kpi-value">${fmtEuro(totale2025)}</div>
+        <div class="kpi-diff neu">periodo equivalente</div>
+      </div>
+      <div class="kpi ${diffCop >= 0 ? 'highlight' : ''}">
+        <div class="kpi-label">Coperti 2026 (progressivo)</div>
+        <div class="kpi-value">${fmtNum(totCop2026)}</div>
+        <div class="kpi-diff ${diffCop >= 0 ? 'pos' : 'neg'}">${diffStr(diffCop, v => fmtNum(v))} vs 2025</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Scontrino medio 2026</div>
+        <div class="kpi-value">${fmtEuro2(scMedio2026)}</div>
+        <div class="kpi-diff ${diffSc !== null && diffSc >= 0 ? 'pos' : 'neg'}">${diffStr(diffSc, fmtEuro2)} vs 2025</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Osteria 2026 (progressivo)</div>
+        <div class="kpi-value">${fmtEuro(ost2026)}</div>
+        <div class="kpi-diff ${diffOst >= 0 ? 'pos' : 'neg'}">${diffStr(diffOst, fmtEuro)} vs 2025</div>
+      </div>
+    </div>
+
+    <div class="sezione-titolo">Incassi giornalieri — cucina</div>
+    <div class="chart-card">
+      <div class="legend">
+        <span><span class="legend-dot" style="background:${c2025col}"></span>2025</span>
+        <span><span class="legend-dot" style="background:${c2026col};"></span>2026</span>
+      </div>
+      <div style="position:relative;height:260px;"><canvas id="ch1" role="img" aria-label="Incassi giornalieri 2025 vs 2026"></canvas></div>
+    </div>
+
+    <div class="sezione-titolo">Coperti giornalieri</div>
+    <div class="chart-card">
+      <div class="legend">
+        <span><span class="legend-dot" style="background:${c2025col}"></span>2025</span>
+        <span><span class="legend-dot" style="background:${c2026col}"></span>2026</span>
+      </div>
+      <div style="position:relative;height:230px;"><canvas id="ch2" role="img" aria-label="Coperti giornalieri 2025 vs 2026"></canvas></div>
+    </div>
+
+    <div class="sezione-titolo">Scontrino medio pro capite</div>
+    <div class="chart-card">
+      <div class="legend">
+        <span><span class="legend-dot" style="background:${c2025col}"></span>2025</span>
+        <span><span class="legend-dot" style="background:${c2026col}; border: 1px dashed ${c2026col}"></span>2026</span>
+      </div>
+      <div style="position:relative;height:210px;"><canvas id="ch3" role="img" aria-label="Scontrino medio pro capite 2025 vs 2026"></canvas></div>
+    </div>
+
+    <div class="sezione-titolo">Dettaglio giornaliero</div>
+    <div class="chart-card" style="overflow-x:auto;">
+      <table class="giorni-table">
+        <thead>
+          <tr>
+            <th>Giorno</th>
+            <th>Incassi 2025</th>
+            <th>Incassi 2026</th>
+            <th>Diff. incassi</th>
+            <th>Coperti 2025</th>
+            <th>Coperti 2026</th>
+            <th>Diff. coperti</th>
+            <th>Scontrino 2025</th>
+            <th>Scontrino 2026</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${giorni.map(g => g.chiusi ? `
+            <tr>
+              <td>${g.data}</td>
+              <td colspan="8" class="chiusi" style="text-align:center;">chiusi</td>
+            </tr>` : `
+            <tr>
+              <td>${g.data}</td>
+              <td>${fmtEuro(g.inc2025)}</td>
+              <td>${fmtEuro(g.inc2026)}</td>
+              <td class="${diffClass(g.diffInc)}">${diffStr(g.diffInc, fmtEuro)}</td>
+              <td>${fmtNum(g.cop2025)}</td>
+              <td>${fmtNum(g.cop2026)}</td>
+              <td class="${diffClass(g.diffCop)}">${diffStr(g.diffCop, v => fmtNum(v))}</td>
+              <td>${fmtEuro2(g.sc2025)}</td>
+              <td>${fmtEuro2(g.sc2026)}</td>
+            </tr>`).join('')}
+          <tr class="totale">
+            <td>Totale</td>
+            <td>${fmtEuro(totale2025)}</td>
+            <td>${fmtEuro(totale2026)}</td>
+            <td class="${diffClass(diffTotale)}">${diffStr(diffTotale, fmtEuro)}</td>
+            <td>${fmtNum(totCop2025)}</td>
+            <td>${fmtNum(totCop2026)}</td>
+            <td class="${diffClass(diffCop)}">${diffStr(diffCop, v => fmtNum(v))}</td>
+            <td>${fmtEuro2(scMedio2025)}</td>
+            <td>${fmtEuro2(scMedio2026)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('contenuto').innerHTML = html;
+
+  const baseScales = {
+    x: { ticks: { color: textCol, font: { size: 11 }, autoSkip: false, maxRotation: 40 }, grid: { color: gridCol } },
+    y: { ticks: { color: textCol, font: { size: 11 }, callback: v => '€' + v.toLocaleString('it-IT') }, grid: { color: gridCol } }
+  };
+
+  const c1 = new Chart(document.getElementById('ch1'), {
+    type: 'bar',
+    data: {
+      labels: labelsG,
+      datasets: [
+        { label: '2025', data: giorniGrafico.map(g => g.inc2025), backgroundColor: c2025col + 'bb', borderColor: c2025col, borderWidth: 1.5, borderRadius: 3 },
+        { label: '2026', data: giorniGrafico.map(g => g.inc2026), backgroundColor: c2026col + 'bb', borderColor: c2026col, borderWidth: 1.5, borderRadius: 3 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: baseScales }
+  });
+  chartInstances.push(c1);
+
+  const c2 = new Chart(document.getElementById('ch2'), {
+    type: 'bar',
+    data: {
+      labels: labelsG,
+      datasets: [
+        { label: '2025', data: giorniGrafico.map(g => g.cop2025), backgroundColor: c2025col + 'bb', borderColor: c2025col, borderWidth: 1.5, borderRadius: 3 },
+        { label: '2026', data: giorniGrafico.map(g => g.cop2026), backgroundColor: c2026col + 'bb', borderColor: c2026col, borderWidth: 1.5, borderRadius: 3 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: baseScales.x, y: { ticks: { color: textCol, font: { size: 11 } }, grid: { color: gridCol } } }
+    }
+  });
+  chartInstances.push(c2);
+
+  const c3 = new Chart(document.getElementById('ch3'), {
+    type: 'line',
+    data: {
+      labels: labelsG,
+      datasets: [
+        { label: '2025', data: giorniGrafico.map(g => g.sc2025), borderColor: c2025col, backgroundColor: 'transparent', pointRadius: 5, tension: 0.3 },
+        { label: '2026', data: giorniGrafico.map(g => g.sc2026), borderColor: c2026col, backgroundColor: 'transparent', pointRadius: 5, borderDash: [5, 3], tension: 0.3 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: baseScales.x, y: { ticks: { color: textCol, font: { size: 11 }, callback: v => '€' + v.toFixed(2) }, grid: { color: gridCol } } }
+    }
+  });
+  chartInstances.push(c3);
+}
+
+caricaDati();
+</script>
+</body>
+</html>
