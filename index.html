@@ -287,8 +287,14 @@ function parseCSV(text) {
 }
 
 function num(v) {
-  if (!v || v === '' || v === '#REF!' || v === '#N/A' || v.toLowerCase() === 'chiusi') return null;
-  const n = parseFloat(v.replace(',', '.').replace(/[^\d.\-]/g, ''));
+  if (!v || v === '' || v === '#REF!' || v === '#N/A' || v === '#VALUE!' || v.toLowerCase() === 'chiusi') return null;
+  // Formato italiano: € 6.498,00 → punto = migliaia, virgola = decimale
+  let s = v.replace(/€/g, '').replace(/\s/g, '');
+  // Rimuovi punti separatori migliaia, converti virgola decimale in punto
+  s = s.replace(/\./g, '').replace(',', '.');
+  // Rimuovi eventuali caratteri non numerici rimasti (tranne - e .)
+  s = s.replace(/[^\d.\-]/g, '');
+  const n = parseFloat(s);
   return isNaN(n) ? null : n;
 }
 
@@ -363,7 +369,7 @@ function renderDashboard(rows) {
     const r = rows[i];
     if (!r || r.length < 5) continue;
     const rawData = r[1];
-    if (!rawData || rawData === '' || rawData.toLowerCase().includes('totale') || rawData.toLowerCase().includes('nel 2025')) continue;
+    if (!rawData || rawData === '' || rawData.toUpperCase().includes('NEL 2025') || rawData.toUpperCase().includes('TOTALE')) continue;
 
     const inc2025 = num(r[3]);
     const inc2026 = num(r[4]);
@@ -376,7 +382,7 @@ function renderDashboard(rows) {
 
     const giorno = {
       data: rawData.includes('/') ? rawData : formatData(rawData),
-      chiusi: rawData.toLowerCase().includes('chiusi') || r[4] === 'chiusi' || (inc2025 === null && inc2026 === null && rawData !== ''),
+      chiusi: (r[3] || '').toLowerCase() === 'chiusi' || (r[4] || '').toLowerCase() === 'chiusi',
       inc2025, inc2026,
       diffInc: (inc2026 !== null && inc2025 !== null) ? inc2026 - inc2025 : null,
       cop2025, cop2026,
