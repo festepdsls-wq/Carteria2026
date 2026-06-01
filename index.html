@@ -393,19 +393,19 @@ function renderDashboard(rows) {
 
     giorni.push(giorno);
 
-    if (inc2025 !== null) totale2025 += inc2025;
+    if (inc2025 !== null && inc2026 !== null) totale2025 += inc2025;
     if (inc2026 !== null) totale2026 += inc2026;
-    if (cop2025 !== null) totCop2025 += cop2025;
+    if (cop2025 !== null && cop2026 !== null) totCop2025 += cop2025;
     if (cop2026 !== null) totCop2026 += cop2026;
-    if (o2025 !== null) ost2025 += o2025;
-    if (o2026 !== null) ost2026 += o2026;
+    if (o2025 !== null && o2026 !== null && o2026 > 0) ost2025 += o2025;
+    if (o2026 !== null && o2026 > 0) ost2026 += o2026;
     if (sc2025 !== null && sc2026 !== null) { sumScont2025 += sc2025; sumScont2026 += sc2026; countScontrino++; }
   }
 
   const diffTotale = totale2026 - totale2025;
   const diffCop = totCop2026 - totCop2025;
-  const scMedio2025 = countScontrino > 0 ? sumScont2025 / countScontrino : null;
-  const scMedio2026 = countScontrino > 0 ? sumScont2026 / countScontrino : null;
+  const scMedio2025 = totCop2025 > 0 ? totale2025 / totCop2025 : null;
+  const scMedio2026 = totCop2026 > 0 ? totale2026 / totCop2026 : null;
   const diffSc = (scMedio2025 && scMedio2026) ? scMedio2026 - scMedio2025 : null;
   const diffOst = ost2026 - ost2025;
 
