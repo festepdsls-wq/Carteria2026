@@ -210,7 +210,7 @@ function renderDashboard(rows) {
 
   const C25 = '#96281b', C26 = '#1a7a4a';
   const gridCol = 'rgba(0,0,0,0.06)', textCol = '#7a7570';
-  const gG = giorni.filter(g => !g.chiusi);
+  const gG = giorni.filter(g => !g.chiusi && g.inc26 != null);
   const labG = gG.map(g => g.data.replace(/^(lun|mar|mer|gio|ven|sab|dom)\s+/i,'').trim());
 
   const legenda = `<div class="legend"><span><span class="legend-dot" style="background:${C25}"></span>2025</span><span><span class="legend-dot" style="background:${C26}"></span>2026</span></div>`;
@@ -270,7 +270,7 @@ function renderDashboard(rows) {
           <th>Scontrino 2025</th><th>Scontrino 2026</th>
         </tr></thead>
         <tbody>
-          ${giorni.map(g => g.chiusi
+          ${giorni.filter(g => g.inc26 != null).map(g => g.chiusi
             ? `<tr><td>${g.data}</td><td colspan="8" class="chiusi-cell" style="text-align:center">chiusi</td></tr>`
             : `<tr>
                 <td>${g.data}</td>
