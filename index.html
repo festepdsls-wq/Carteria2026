@@ -3,248 +3,332 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#c0392b">
+<meta name="theme-color" content="#b22222">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Carteria 2026">
-<title>Festa della Carteria 2026</title>
+<title>Carteria 2026</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --rosso: #c0392b;
-  --verde: #1a7a4a;
-  --verde-chiaro: #e8f5ee;
-  --oro: #c9902a;
-  --oro-chiaro: #fdf3e0;
-  --bg: #f5f3ef;
+  --rosso: #b22222;
+  --rosso-scuro: #8b0000;
+  --verde: #1a6b3a;
+  --verde-chiaro: #e6f4ec;
+  --oro: #c8931a;
+  --oro-chiaro: #fdf3dc;
+  --bg: #f7f5f0;
   --card: #ffffff;
-  --testo: #2c2c2c;
+  --testo: #1e1e1e;
   --muted: #7a7570;
-  --bordo: #e0dbd3;
+  --bordo: #e2ddd6;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--testo); min-height: 100vh; padding-bottom: calc(1rem + var(--safe-bottom)); }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--testo); min-height: 100vh; overflow-x: hidden; }
 
-/* HEADER */
+/* ── HEADER ── */
 header {
-  background: var(--rosso);
+  background: linear-gradient(160deg, var(--rosso-scuro) 0%, var(--rosso) 100%);
   color: white;
-  padding: calc(1rem + var(--safe-top)) 1rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: calc(0.75rem + var(--safe-top)) 1rem 0;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.25);
 }
-header h1 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.1; }
-header h1 span { display: block; font-family: 'DM Sans', sans-serif; font-size: 0.65rem; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
-.header-right { text-align: right; font-size: 0.7rem; opacity: 0.85; line-height: 1.5; flex-shrink: 0; }
+.header-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.header-logo { display: flex; align-items: center; gap: 0.6rem; }
+.logo-circle {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: white; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.logo-circle svg { width: 36px; height: 36px; }
+.header-titles h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem; font-weight: 900; line-height: 1.1;
+}
+.header-titles .sub {
+  font-size: 0.65rem; font-weight: 300; opacity: 0.8;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.update-time { font-size: 0.65rem; opacity: 0.75; }
 .btn-refresh {
-  display: flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 50%;
-  color: white; cursor: pointer;
-  margin-top: 4px; margin-left: auto;
-  flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: white; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
 }
 .btn-refresh.loading svg { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* MAIN */
-main { padding: 0.75rem; max-width: 600px; margin: 0 auto; }
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 0;
+  border-bottom: none;
+  margin-top: 0.25rem;
+}
+.tab-btn {
+  flex: 1; padding: 0.65rem 0.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  background: none; border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer; transition: all 0.2s;
+}
+.tab-btn.active {
+  color: white;
+  border-bottom-color: white;
+}
 
-/* NOTA */
-.nota {
+/* ── MAIN ── */
+main { padding: 0.75rem; max-width: 540px; margin: 0 auto; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── DATA BANNER ── */
+.data-banner {
   background: var(--oro-chiaro);
   border-left: 3px solid var(--oro);
   border-radius: 6px;
-  padding: 0.6rem 0.75rem;
-  font-size: 0.75rem;
-  color: #6b4c10;
-  margin-bottom: 0.75rem;
-  line-height: 1.4;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.75rem; color: #705a10;
+  margin-bottom: 0.85rem; line-height: 1.4;
 }
 
-/* SEZIONE TITOLO */
+/* ── SECTION TITLE ── */
 .sez {
-  font-size: 0.65rem; font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--muted); margin: 1rem 0 0.5rem;
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin: 1.1rem 0 0.5rem;
   display: flex; align-items: center; gap: 8px;
 }
 .sez::after { content: ''; flex: 1; height: 1px; background: var(--bordo); }
 
-/* KPI GRID — 2 colonne su mobile */
-.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 0.25rem; }
+/* ── KPI GRID ── */
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .kpi {
   background: var(--card);
   border: 1px solid var(--bordo);
-  border-radius: 10px;
-  padding: 0.85rem 0.9rem;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  transition: transform 0.15s;
 }
+.kpi:active { transform: scale(0.98); }
 .kpi.wide { grid-column: 1 / -1; }
-.kpi.highlight { border-color: var(--verde); background: var(--verde-chiaro); }
-.kpi-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 4px; font-weight: 500; line-height: 1.3; }
-.kpi-value { font-family: 'DM Serif Display', serif; font-size: 1.6rem; line-height: 1; margin-bottom: 3px; }
-.kpi-diff { font-size: 0.7rem; font-weight: 500; }
-.pos { color: var(--verde); } .neg { color: var(--rosso); } .neu { color: var(--muted); }
-
-/* GRAFICI */
-.chart-card {
-  background: var(--card);
-  border: 1px solid var(--bordo);
-  border-radius: 10px;
-  padding: 0.9rem;
-  margin-bottom: 0.75rem;
+.kpi.pos-highlight { border-color: var(--verde); background: var(--verde-chiaro); }
+.kpi.neg-highlight { border-color: #e0c8c8; background: #fdf3f3; }
+.kpi-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+.kpi-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.65rem; line-height: 1.05; margin-bottom: 4px;
 }
-.legend { display: flex; gap: 12px; font-size: 0.68rem; color: var(--muted); margin-bottom: 8px; }
-.legend span { display: flex; align-items: center; gap: 4px; }
+.kpi-diff { font-size: 0.7rem; font-weight: 600; }
+.dp { color: var(--verde); } .dn { color: var(--rosso); } .neu { color: var(--muted); }
+.kpi-placeholder { font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 2px; }
+
+/* ── CHART ── */
+.chart-card {
+  background: var(--card); border: 1px solid var(--bordo);
+  border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem;
+}
+.chart-legend { display: flex; gap: 14px; font-size: 0.68rem; color: var(--muted); margin-bottom: 10px; }
+.chart-legend span { display: flex; align-items: center; gap: 5px; }
 .ldot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 
-/* TABELLA — collassabile */
-.tabella-toggle {
-  width: 100%;
-  background: var(--card);
-  border: 1px solid var(--bordo);
-  border-radius: 10px;
-  padding: 0.85rem 1rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--testo);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0;
+/* ── VENDITE TABLE ── */
+.vendite-toggle {
+  width: 100%; background: var(--card); border: 1px solid var(--bordo);
+  border-radius: 12px; padding: 0.85rem 1rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+  color: var(--testo); cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
 }
-.tabella-toggle .arrow { transition: transform 0.2s; font-size: 0.7rem; }
-.tabella-toggle.open .arrow { transform: rotate(180deg); }
-.tabella-wrap {
-  display: none;
-  background: var(--card);
-  border: 1px solid var(--bordo);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  overflow-x: auto;
-  margin-bottom: 0.75rem;
+.vendite-toggle .vtarrow { font-size: 0.65rem; color: var(--muted); transition: transform 0.2s; }
+.vendite-toggle.open .vtarrow { transform: rotate(180deg); }
+.vendite-wrap {
+  display: none; background: var(--card); border: 1px solid var(--bordo);
+  border-top: none; border-radius: 0 0 12px 12px;
+  overflow: hidden; margin-bottom: 0.75rem;
 }
-.tabella-wrap.open { display: block; }
-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
-th { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--bordo); white-space: nowrap; }
-th:first-child { text-align: left; }
-td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--bordo); font-variant-numeric: tabular-nums; white-space: nowrap; }
-td:first-child { text-align: left; font-weight: 500; }
-tr:last-child td { border-bottom: none; }
-tr.tot td { font-weight: 600; background: var(--bg); border-top: 2px solid var(--bordo); }
-.dp { color: var(--verde); font-weight: 500; }
-.dn { color: var(--rosso); font-weight: 500; }
-.chiusi-r { color: var(--bordo); font-style: italic; text-align: center; }
+.vendite-wrap.open { display: block; }
 
-.error-msg { background: #fdecea; border: 1px solid #f5c6c3; border-radius: 8px; padding: 0.9rem; color: #a0281e; font-size: 0.8rem; }
-footer { text-align: center; font-size: 0.68rem; color: var(--muted); padding: 1.5rem 1rem; }
-
-/* INSTALL BANNER */
-#install-banner {
-  display: none;
-  background: var(--rosso);
-  color: white;
-  padding: 0.75rem 1rem;
-  font-size: 0.8rem;
-  align-items: center;
-  gap: 0.75rem;
-  justify-content: space-between;
+/* Sort tabs inside vendite */
+.sort-tabs {
+  display: flex; border-bottom: 1px solid var(--bordo);
 }
-#install-banner button {
-  background: white;
-  color: var(--rosso);
-  border: none;
-  border-radius: 20px;
-  padding: 5px 14px;
+.sort-tab {
+  flex: 1; padding: 0.55rem; font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--muted); background: none; border: none;
+  border-bottom: 2px solid transparent; cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
 }
+.sort-tab.active { color: var(--rosso); border-bottom-color: var(--rosso); }
+
+.vtable { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+.vtable th {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--muted); text-align: right;
+  padding: 6px 10px; border-bottom: 1px solid var(--bordo);
+  background: var(--bg);
+}
+.vtable th:first-child { text-align: left; }
+.vtable td {
+  padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--bordo);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.vtable td:first-child { text-align: left; white-space: normal; max-width: 180px; }
+.vtable tr:last-child td { border-bottom: none; }
+.vtable tr.total-row td { font-weight: 700; background: var(--bg); border-top: 2px solid var(--bordo); }
+.rank { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: var(--rosso); color: white; font-size: 0.6rem; font-weight: 700; text-align: center; line-height: 18px; margin-right: 5px; flex-shrink: 0; }
+.rank-1 { background: #c8931a; }
+.rank-2 { background: #888; }
+.rank-3 { background: #a05020; }
+
+/* ── OSTERIA/BAR SUB-TABS ── */
+.sub-tabs {
+  display: flex; gap: 6px; margin-bottom: 0.85rem;
+}
+.sub-tab {
+  flex: 1; padding: 0.55rem; font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--muted); background: var(--card);
+  border: 1px solid var(--bordo); border-radius: 8px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s; text-align: center;
+}
+.sub-tab.active {
+  color: white; background: var(--rosso); border-color: var(--rosso);
+}
+
+/* ── GIORNALIERO TABLE ── */
+.giorni-toggle {
+  width: 100%; background: var(--card); border: 1px solid var(--bordo);
+  border-radius: 12px; padding: 0.85rem 1rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+  color: var(--testo); cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.giorni-toggle .vtarrow { font-size: 0.65rem; color: var(--muted); transition: transform 0.2s; }
+.giorni-toggle.open .vtarrow { transform: rotate(180deg); }
+.giorni-wrap {
+  display: none; background: var(--card); border: 1px solid var(--bordo);
+  border-top: none; border-radius: 0 0 12px 12px;
+  overflow-x: auto; margin-bottom: 0.75rem;
+}
+.giorni-wrap.open { display: block; }
+.gtable { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+.gtable th {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--muted); text-align: right;
+  padding: 6px 8px; border-bottom: 1px solid var(--bordo); white-space: nowrap;
+  background: var(--bg);
+}
+.gtable th:first-child { text-align: left; }
+.gtable td {
+  padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--bordo);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.gtable td:first-child { text-align: left; }
+.gtable tr:last-child td { border-bottom: none; }
+.gtable tr.gtotal td { font-weight: 700; background: var(--bg); border-top: 2px solid var(--bordo); }
+.gdp { color: var(--verde); font-weight: 600; }
+.gdn { color: var(--rosso); font-weight: 600; }
+
+.error-msg { background: #fdecea; border: 1px solid #f5b8b8; border-radius: 10px; padding: 1rem; color: #8b1a1a; font-size: 0.8rem; }
+footer { text-align: center; font-size: 0.65rem; color: var(--muted); padding: 1.5rem 1rem calc(1.5rem + var(--safe-bottom)); }
 </style>
 </head>
 <body>
 
-<div id="install-banner">
-  <span>📲 Aggiungi alla schermata Home</span>
-  <button id="btn-install">Installa</button>
-</div>
-
 <header>
-  <div>
-    <h1><span>Festa della</span>Carteria 2026</h1>
-    <div id="giorni-count" style="font-size:0.65rem;opacity:0.75;margin-top:2px;"></div>
+  <div class="header-top">
+    <div class="header-logo">
+      <div class="logo-circle">
+        <!-- Logo FestUnità semplificato -->
+        <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" fill="#111"/>
+          <text x="4" y="15" font-family="serif" font-size="9" font-weight="900" fill="#cc2200">FEST</text>
+          <circle cx="18" cy="22" r="7" fill="#1a7a2a"/>
+          <text x="18" y="26" font-family="serif" font-size="8" font-weight="900" fill="white" text-anchor="middle">U</text>
+          <text x="22" y="15" font-family="serif" font-size="9" font-weight="900" fill="#cc2200">NITÀ</text>
+        </svg>
+      </div>
+      <div class="header-titles">
+        <div class="sub">Festa della</div>
+        <h1>Carteria 2026</h1>
+        <div id="header-sub" style="font-size:0.65rem;opacity:0.7;margin-top:1px;"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="update-time" id="last-update">—</div>
+      <button class="btn-refresh" id="btnRefresh" onclick="caricaDati()" aria-label="Aggiorna">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+    </div>
   </div>
-  <div class="header-right">
-    <div>⏱ <span id="last-update">—</span></div>
-    <button class="btn-refresh" id="btnRefresh" onclick="caricaDati()" aria-label="Aggiorna">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-    </button>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('ristorante')">🍽 Ristorante</button>
+    <button class="tab-btn" onclick="switchTab('osteria')">🍺 Osteria &amp; Bar</button>
   </div>
 </header>
 
 <main>
-  <div id="contenuto">
-    <div style="text-align:center;padding:3rem;color:var(--muted);">
-      <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
-      <div style="font-size:0.9rem;">Caricamento dati...</div>
+  <!-- TAB RISTORANTE -->
+  <div class="tab-panel active" id="tab-ristorante">
+    <div id="rist-content">
+      <div style="text-align:center;padding:3rem;color:var(--muted);">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">⏳</div>
+        <div>Caricamento...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB OSTERIA & BAR -->
+  <div class="tab-panel" id="tab-osteria">
+    <div id="ost-content">
+      <div style="text-align:center;padding:3rem;color:var(--muted);">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">⏳</div>
+        <div>Caricamento...</div>
+      </div>
     </div>
   </div>
 </main>
 
-<footer>Cruscotto Festa della Carteria · Dati live da Google Sheets</footer>
+<footer>Carteria 2026 · Dati live da Google Sheets</footer>
 
 <script>
-// PWA: Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
-// PWA: Install prompt
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('install-banner').style.display = 'flex';
-});
-document.getElementById('btn-install').addEventListener('click', () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => {
-      deferredPrompt = null;
-      document.getElementById('install-banner').style.display = 'none';
-    });
-  }
-});
-
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxvPw7GkLWP0FxkBID3tHQe1acQ94dxCM27OAuq0br29_P39VNF9GqsuUZbt3R7hFmycPk1G4Urv9H/pub?gid=2124551819&single=true&output=csv';
 let charts = [];
+let lastData = null;
+let activeSubTab = 'osteria';
 
+// ── UTILS ──
 function parseCSV(text) {
-  const rows = [];
-  const lines = text.split(/\r?\n/);
+  const rows = []; const lines = text.split(/\r?\n/);
   for (const line of lines) {
     const row = []; let inQ = false, cell = '';
     for (let i = 0; i < line.length; i++) {
       const c = line[i];
-      if (c === '"') { if (inQ && line[i+1] === '"') { cell += '"'; i++; } else inQ = !inQ; }
-      else if (c === ',' && !inQ) { row.push(cell); cell = ''; }
-      else { cell += c; }
+      if (c === '"') { if (inQ && line[i+1]==='"'){cell+='"';i++;}else inQ=!inQ; }
+      else if (c===',' && !inQ){row.push(cell);cell='';}
+      else cell+=c;
     }
     row.push(cell); rows.push(row);
   }
@@ -254,40 +338,68 @@ function parseCSV(text) {
 function num(v) {
   if (!v) return null;
   const s = v.trim();
-  if (!s || ['#REF!','#N/A','#VALUE!'].includes(s)) return null;
-  if (s.toLowerCase() === 'chiusi') return null;
+  if (!s || ['#REF!','#N/A','#VALUE!'].includes(s) || s.toLowerCase()==='chiusi') return null;
   let n = s.replace(/€/g,'').replace(/\s/g,'').replace(/\./g,'').replace(',','.');
   n = n.replace(/[^\d.\-]/g,'');
-  const f = parseFloat(n);
-  return isNaN(f) ? null : f;
+  const f = parseFloat(n); return isNaN(f) ? null : f;
 }
 
-function fe(v) { if (v==null) return '—'; return '€\u00a0'+Math.round(v).toLocaleString('it-IT'); }
-function fe2(v) { if (v==null) return '—'; return '€\u00a0'+v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function fn(v) { if (v==null) return '—'; return Math.round(v).toLocaleString('it-IT'); }
-function ds(v,fmt) { if (v==null) return '—'; return (v>=0?'▲ +':'▼ ')+fmt(Math.abs(v)); }
-function dc(v) { return v==null?'':v>=0?'dp':'dn'; }
+function fe(v,dec=0) {
+  if (v==null) return '—';
+  return '€\u00a0'+v.toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+}
+function fn(v) { if(v==null)return '—'; return Math.round(v).toLocaleString('it-IT'); }
+function ds(v,fmt,dec) { if(v==null)return '—'; return(v>=0?'▲ +':'▼ ')+fmt(Math.abs(v),dec); }
+function dc(v){return v==null?'':v>=0?'dp':'dn';}
 
+function fmtData(raw) {
+  return raw.replace(/^(lun|mar|mer|gio|ven|sab|dom)\s+/i,'').replace(/\/26$/,'').trim();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', (i===0&&tab==='ristorante')||(i===1&&tab==='osteria')));
+  document.getElementById('tab-ristorante').classList.toggle('active', tab==='ristorante');
+  document.getElementById('tab-osteria').classList.toggle('active', tab==='osteria');
+}
+
+function switchSubTab(sub) {
+  activeSubTab = sub;
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.dataset.sub===sub));
+  document.getElementById('ost-sub-osteria').style.display = sub==='osteria' ? 'block' : 'none';
+  document.getElementById('ost-sub-bar').style.display = sub==='bar' ? 'block' : 'none';
+}
+
+function toggleSection(btnId, wrapId) {
+  const btn = document.getElementById(btnId);
+  const wrap = document.getElementById(wrapId);
+  if (!btn||!wrap) return;
+  btn.classList.toggle('open');
+  wrap.classList.toggle('open');
+}
+
+// ── FETCH ──
 async function caricaDati() {
   const btn = document.getElementById('btnRefresh');
   btn.classList.add('loading');
   try {
     const res = await fetch(CSV_URL + '&nocache=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    renderDashboard(parseCSV(await res.text()));
+    const rows = parseCSV(await res.text());
+    lastData = rows;
+    renderAll(rows);
     document.getElementById('last-update').textContent = new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   } catch(e) {
-    document.getElementById('contenuto').innerHTML =
-      '<div class="error-msg"><strong>Impossibile caricare i dati.</strong><br>'+e.message+'</div>';
+    const err = '<div class="error-msg"><strong>Errore caricamento dati</strong><br>'+e.message+'</div>';
+    document.getElementById('rist-content').innerHTML = err;
+    document.getElementById('ost-content').innerHTML = err;
   }
   btn.classList.remove('loading');
 }
 
-function renderDashboard(rows) {
+// ── PARSE DATA ──
+function parseGiorni(rows) {
   const SKIP = ['','data','nel 2025','totale'];
   const giorni = [];
-  let tot25=0,tot26=0,cop25t=0,cop26t=0,ost25t=0,ost26t=0;
-
   for (let i=8; i<rows.length; i++) {
     const r = rows[i];
     if (!r||r.length<5) continue;
@@ -295,127 +407,373 @@ function renderDashboard(rows) {
     if (!rawData) continue;
     const rd = rawData.toLowerCase();
     if (SKIP.some(s=>s&&rd.startsWith(s))) continue;
-    const chiusi = rd.includes('chiusi')||(r[3]||'').toLowerCase().includes('chiusi');
-    const inc25=num(r[3]),inc26=num(r[4]),cop25=num(r[11]),cop26=num(r[12]);
-    const sc25=num(r[19]),sc26=num(r[20]),ost25=num(r[22]),ost26=num(r[23]);
-    giorni.push({data:rawData,chiusi,inc25,inc26,cop25,cop26,sc25,sc26,ost25,ost26,
-      diffInc:(inc25!=null&&inc26!=null)?inc26-inc25:null,
-      diffCop:(cop25!=null&&cop26!=null)?cop26-cop25:null});
-    if (inc26!=null){tot26+=inc26;if(inc25!=null)tot25+=inc25;}
-    if (cop26!=null){cop26t+=cop26;if(cop25!=null)cop25t+=cop25;}
-    if (ost26!=null&&ost26>0){ost26t+=ost26;if(ost25!=null)ost25t+=ost25;}
+    const chiusi = rd.includes('chiusi')||(r[3]||'').toLowerCase()==='chiusi';
+    giorni.push({
+      raw: rawData,
+      label: fmtData(rawData),
+      chiusi,
+      inc25: num(r[3]), inc26: num(r[4]),
+      cop25: num(r[11]), cop26: num(r[12]),
+      sc25: num(r[18]), sc26: num(r[19]),
+      lot25: num(r[22]), lot26: num(r[23]),
+      ost25: num(r[22]), ost26: num(r[23]) // nota: osteria e lotteria stessa col per ora
+    });
+  }
+  // Ultima data con dati 2026
+  const conDati = giorni.filter(g=>g.inc26!=null&&!g.chiusi);
+  const ultimaData = conDati.length > 0 ? conDati[conDati.length-1].label : '—';
+  return { giorni, conDati, ultimaData };
+}
+
+// ── PARSE VENDITE ──
+function parseVendite(rows) {
+  // Ristorante piatti: col 2=nome, col 3=pezzi | col 5=nome, col 6=incasso (da row 49 a 78)
+  // Osteria: col 9=nome, col 10=pezzi | col 12=nome, col 13=incasso (da row 49 a 66)
+  // Bar: col 9=nome, col 10=pezzi | col 12=nome, col 13=incasso (da row 71 a 94)
+  // Bibite ristorante: col 2=nome, col 3=pezzi | col 5=nome, col 6=incasso (da row 85 a 101)
+
+  const ristPezzi = [], ristIncasso = [], ostPezzi = [], ostIncasso = [], barPezzi = [], barIncasso = [], bibPezzi = [], bibIncasso = [];
+
+  for (let i=48; i<rows.length; i++) {
+    const r = rows[i];
+    if (!r) continue;
+
+    // Ristorante piatti (col 2,3 e col 5,6)
+    const rp_nome = (r[2]||'').trim();
+    const rp_pezzi = num(r[3]);
+    const ri_nome = (r[5]||'').trim();
+    const ri_val = num(r[6]);
+
+    if (rp_nome && rp_nome.toLowerCase()!=='totale generale' && rp_nome.toLowerCase()!=='nr. coperti' && rp_nome.toLowerCase()!=='descrizione piatto' && rp_pezzi!=null && i<78) {
+      ristPezzi.push({nome: rp_nome, val: rp_pezzi});
+    }
+    if (ri_nome && ri_nome.toLowerCase()!=='totale generale' && ri_nome.toLowerCase()!=='sum di' && ri_nome.toLowerCase()!=='descrizione piatto' && ri_val!=null && i<78) {
+      ristIncasso.push({nome: ri_nome, val: ri_val});
+    }
+
+    // Osteria (col 9,10 e col 12,13) righe 49-66
+    const op_nome = (r[9]||'').trim();
+    const op_pezzi = num(r[10]);
+    const oi_nome = (r[12]||'').trim();
+    const oi_val = num(r[13]);
+
+    if (i >= 48 && i < 66) {
+      if (op_nome && !op_nome.toLowerCase().includes('totale') && !op_nome.toLowerCase().includes('descrizione') && op_pezzi!=null) {
+        ostPezzi.push({nome: op_nome, val: op_pezzi});
+      }
+      if (oi_nome && !oi_nome.toLowerCase().includes('totale') && !oi_nome.toLowerCase().includes('sum') && oi_val!=null) {
+        ostIncasso.push({nome: oi_nome, val: oi_val});
+      }
+    }
+
+    // Bar (col 9,10 e col 12,13) righe 71-94
+    if (i >= 70 && i < 94) {
+      const bp_nome = (r[9]||'').trim();
+      const bp_pezzi = num(r[10]);
+      const bi_nome = (r[12]||'').trim();
+      const bi_val = num(r[13]);
+      if (bp_nome && !bp_nome.toLowerCase().includes('totale') && !bp_nome.toLowerCase().includes('descrizione') && bp_pezzi!=null) {
+        barPezzi.push({nome: bp_nome, val: bp_pezzi});
+      }
+      if (bi_nome && !bi_nome.toLowerCase().includes('totale') && !bi_nome.toLowerCase().includes('sum') && bi_val!=null) {
+        barIncasso.push({nome: bi_nome, val: bi_val});
+      }
+    }
+
+    // Bibite ristorante (col 2,3 e col 5,6) righe 84-101
+    if (i >= 83 && i < 101) {
+      const bvp_nome = (r[2]||'').trim();
+      const bvp_pezzi = num(r[3]);
+      const bvi_nome = (r[5]||'').trim();
+      const bvi_val = num(r[6]);
+      if (bvp_nome && !bvp_nome.toLowerCase().includes('totale') && !bvp_nome.toLowerCase().includes('descrizione') && bvp_pezzi!=null) {
+        bibPezzi.push({nome: bvp_nome, val: bvp_pezzi});
+      }
+      if (bvi_nome && !bvi_nome.toLowerCase().includes('totale') && !bvi_nome.toLowerCase().includes('sum') && bvi_val!=null) {
+        bibIncasso.push({nome: bvi_nome, val: bvi_val});
+      }
+    }
   }
 
-  const dTot=tot26-tot25, dCop=cop26t-cop25t, dOst=ost26t-ost25t;
-  const sc26m=cop26t>0?tot26/cop26t:null, sc25m=cop25t>0?tot25/cop25t:null;
-  const dSc=(sc26m!=null&&sc25m!=null)?sc26m-sc25m:null;
-  const giorniAp = giorni.filter(g=>g.inc26!=null&&!g.chiusi).length;
-  document.getElementById('giorni-count').textContent = giorniAp+' giorni con dati';
+  return {
+    rist: { pezzi: ristPezzi.sort((a,b)=>b.val-a.val), incasso: ristIncasso.sort((a,b)=>b.val-a.val) },
+    bib: { pezzi: bibPezzi.sort((a,b)=>b.val-a.val), incasso: bibIncasso.sort((a,b)=>b.val-a.val) },
+    ost: { pezzi: ostPezzi.sort((a,b)=>b.val-a.val), incasso: ostIncasso.sort((a,b)=>b.val-a.val) },
+    bar: { pezzi: barPezzi.sort((a,b)=>b.val-a.val), incasso: barIncasso.sort((a,b)=>b.val-a.val) }
+  };
+}
 
+// ── RENDER ──
+function renderAll(rows) {
   charts.forEach(c=>c.destroy()); charts=[];
+  const {giorni, conDati, ultimaData} = parseGiorni(rows);
+  const vendite = parseVendite(rows);
 
-  const C25='#96281b',C26='#1a7a4a',gCol='rgba(0,0,0,0.06)',tCol='#7a7570';
-  const gG = giorni.filter(g=>!g.chiusi&&g.inc26!=null);
-  const labG = gG.map(g=>g.data.replace(/^(lun|mar|mer|gio|ven|sab|dom)\s+/i,'').replace('/26','').trim());
-  const leg = `<div class="legend"><span><span class="ldot" style="background:${C25}"></span>2025</span><span><span class="ldot" style="background:${C26}"></span>2026</span></div>`;
-  const sX={ticks:{color:tCol,font:{size:9},autoSkip:false,maxRotation:45},grid:{color:gCol}};
-  const sYe={ticks:{color:tCol,font:{size:9},callback:v=>'€'+Math.round(v/1000)+'k'},grid:{color:gCol}};
-  const sYn={ticks:{color:tCol,font:{size:9}},grid:{color:gCol}};
+  // Totali solo sui giorni con dati 2026
+  let tot25=0,tot26=0,cop25t=0,cop26t=0,lot25t=0,lot26t=0;
+  for (const g of conDati) {
+    tot26+=g.inc26||0; if(g.inc25!=null)tot25+=g.inc25;
+    cop26t+=g.cop26||0; if(g.cop25!=null)cop25t+=g.cop25;
+    if(g.lot26!=null&&g.lot26>0){lot26t+=g.lot26;if(g.lot25!=null)lot25t+=g.lot25;}
+    else if(g.lot25!=null&&g.lot26===null){/* lotteria non ancora compilata */}
+  }
+  // Lotteria 2025 somma sempre (per confronto)
+  lot25t = conDati.reduce((s,g)=>s+(g.lot25||0),0);
 
-  // Tabella solo giorni 2026
-  const righe2026 = giorni.filter(g=>g.inc26!=null);
-  const tabellaHtml = righe2026.map(g=>
-    `<tr>
-      <td>${g.data.replace(/^(lun|mar|mer|gio|ven|sab|dom)\s+/i,'').replace('/26','')}</td>
-      <td>${fe(g.inc25)}</td><td>${fe(g.inc26)}</td>
-      <td class="${dc(g.diffInc)}">${ds(g.diffInc,fe)}</td>
-      <td>${fn(g.cop26)}</td>
-      <td>${fe2(g.sc26)}</td>
-    </tr>`).join('') +
-    `<tr class="tot">
-      <td>Totale</td>
-      <td>${fe(tot25)}</td><td>${fe(tot26)}</td>
-      <td class="${dc(dTot)}">${ds(dTot,fe)}</td>
-      <td>${fn(cop26t)}</td>
-      <td>${fe2(sc26m)}</td>
-    </tr>`;
+  const sc26m = cop26t>0?tot26/cop26t:null;
+  const sc25m = cop25t>0?tot25/cop25t:null;
+  const dTot=tot26-tot25, dCop=cop26t-cop25t;
+  const dSc=(sc26m&&sc25m)?sc26m-sc25m:null;
+  const dLot=lot26t-lot25t;
 
-  document.getElementById('contenuto').innerHTML = `
-    <div class="nota">⚠️ Confronto sulla stessa finestra temporale (solo giorni con dati 2026).</div>
+  document.getElementById('header-sub').textContent = conDati.length + ' giorni · agg. al ' + ultimaData;
+
+  // ── RISTORANTE ──
+  const C25='#8b3030', C26='#1a6b3a';
+  const gG = conDati;
+  const labG = gG.map(g=>g.label);
+
+  document.getElementById('rist-content').innerHTML = `
+    <div class="data-banner">📅 Aggiornamento al <strong>${ultimaData}</strong> · Confronto sulla stessa finestra temporale 2025</div>
 
     <div class="sez">Riepilogo progressivo</div>
     <div class="kpi-grid">
-      <div class="kpi ${dTot>=0?'highlight':''}">
-        <div class="kpi-label">Incassi 2026</div>
+      <div class="kpi wide ${dTot>=0?'pos-highlight':'neg-highlight'}">
+        <div class="kpi-label">Incassi Ristorante 2026</div>
         <div class="kpi-value">${fe(tot26)}</div>
-        <div class="kpi-diff ${dTot>=0?'pos':'neg'}">${ds(dTot,fe)} vs 2025</div>
+        <div class="kpi-diff ${dc(dTot)}">${ds(dTot,fe)} vs 2025</div>
       </div>
-      <div class="kpi">
-        <div class="kpi-label">Incassi 2025</div>
-        <div class="kpi-value">${fe(tot25)}</div>
-        <div class="kpi-diff neu">stesso periodo</div>
-      </div>
-      <div class="kpi ${dCop>=0?'highlight':''}">
+      <div class="kpi ${dCop>=0?'pos-highlight':'neg-highlight'}">
         <div class="kpi-label">Coperti 2026</div>
         <div class="kpi-value">${fn(cop26t)}</div>
-        <div class="kpi-diff ${dCop>=0?'pos':'neg'}">${ds(dCop,fn)} vs 2025</div>
+        <div class="kpi-diff ${dc(dCop)}">${ds(dCop,fn)} vs 2025</div>
       </div>
-      <div class="kpi ${dSc!=null&&dSc>=0?'highlight':''}">
+      <div class="kpi ${dSc!=null&&dSc>=0?'pos-highlight':'neg-highlight'}">
         <div class="kpi-label">Scontrino medio</div>
-        <div class="kpi-value">${fe2(sc26m)}</div>
-        <div class="kpi-diff ${dSc!=null&&dSc>=0?'pos':'neg'}">${ds(dSc,fe2)} vs 2025</div>
+        <div class="kpi-value">${fe(sc26m,2)}</div>
+        <div class="kpi-diff ${dc(dSc)}">${ds(dSc,fe,2)} vs 2025</div>
       </div>
-      <div class="kpi wide ${dOst>=0?'highlight':''}">
-        <div class="kpi-label">Osteria 2026</div>
-        <div class="kpi-value">${fe(ost26t)}</div>
-        <div class="kpi-diff ${dOst>=0?'pos':'neg'}">${ds(dOst,fe)} vs 2025</div>
+      <div class="kpi wide">
+        <div class="kpi-label">Lotteria 2026</div>
+        <div class="kpi-value">${lot26t>0?fe(lot26t):'—'}</div>
+        ${lot26t>0
+          ? `<div class="kpi-diff ${dc(dLot)}">${ds(dLot,fe)} vs 2025</div>`
+          : `<div class="kpi-placeholder">Dati in aggiornamento · 2025: ${fe(lot25t)}</div>`}
       </div>
     </div>
 
     <div class="sez">Incassi giornalieri</div>
-    <div class="chart-card">${leg}<div style="position:relative;height:200px"><canvas id="ch1"></canvas></div></div>
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span><span class="ldot" style="background:${C25}"></span>2025</span>
+        <span><span class="ldot" style="background:${C26}"></span>2026</span>
+      </div>
+      <div style="position:relative;height:210px"><canvas id="ch-rist"></canvas></div>
+    </div>
 
-    <div class="sez">Coperti giornalieri</div>
-    <div class="chart-card">${leg}<div style="position:relative;height:180px"><canvas id="ch2"></canvas></div></div>
+    <div class="sez">Riepilogo vendite</div>
 
-    <div class="sez">Scontrino medio</div>
-    <div class="chart-card">${leg}<div style="position:relative;height:170px"><canvas id="ch3"></canvas></div></div>
-
-    <div class="sez">Dettaglio</div>
-    <button class="tabella-toggle" id="tgl-btn" onclick="toggleTabella()">
-      <span>Tabella giornaliera</span><span class="arrow">▼</span>
+    <button class="vendite-toggle" id="vt-piatti" onclick="toggleSection('vt-piatti','vw-piatti')">
+      <span>🍝 Portate</span><span class="vtarrow">▼</span>
     </button>
-    <div class="tabella-wrap" id="tgl-wrap">
-      <table>
-        <thead><tr>
-          <th>Giorno</th><th>Inc 25</th><th>Inc 26</th><th>Diff</th><th>Cop 26</th><th>Sco 26</th>
-        </tr></thead>
-        <tbody>${tabellaHtml}</tbody>
-      </table>
-    </div>`;
+    <div class="vendite-wrap" id="vw-piatti">
+      <div class="sort-tabs">
+        <button class="sort-tab active" id="st-pezzi-p" onclick="sortVendite('piatti','pezzi')">Per pezzi</button>
+        <button class="sort-tab" id="st-inc-p" onclick="sortVendite('piatti','incasso')">Per incasso</button>
+      </div>
+      <div id="vt-piatti-body"></div>
+    </div>
 
-  function mkBar(id,d25,d26,sy){
-    const c=new Chart(document.getElementById(id),{type:'bar',data:{labels:labG,datasets:[
-      {label:'2025',data:d25,backgroundColor:C25+'aa',borderColor:C25,borderWidth:1.5,borderRadius:3},
-      {label:'2026',data:d26,backgroundColor:C26+'aa',borderColor:C26,borderWidth:1.5,borderRadius:3}
-    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:sX,y:sy}}});
-    charts.push(c);
-  }
-  mkBar('ch1',gG.map(g=>g.inc25),gG.map(g=>g.inc26),sYe);
-  mkBar('ch2',gG.map(g=>g.cop25),gG.map(g=>g.cop26),sYn);
-  const c3=new Chart(document.getElementById('ch3'),{type:'line',data:{labels:labG,datasets:[
-    {label:'2025',data:gG.map(g=>g.sc25),borderColor:C25,backgroundColor:'transparent',pointRadius:4,tension:0.3},
-    {label:'2026',data:gG.map(g=>g.sc26),borderColor:C26,backgroundColor:'transparent',pointRadius:4,borderDash:[5,3],tension:0.3}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-    scales:{x:sX,y:{ticks:{color:tCol,font:{size:9},callback:v=>'€'+v.toFixed(0)},grid:{color:gCol}}}}});
-  charts.push(c3);
+    <button class="vendite-toggle" id="vt-bibite" onclick="toggleSection('vt-bibite','vw-bibite')" style="margin-top:4px">
+      <span>🥤 Bibite</span><span class="vtarrow">▼</span>
+    </button>
+    <div class="vendite-wrap" id="vw-bibite">
+      <div class="sort-tabs">
+        <button class="sort-tab active" id="st-pezzi-b" onclick="sortVendite('bibite','pezzi')">Per pezzi</button>
+        <button class="sort-tab" id="st-inc-b" onclick="sortVendite('bibite','incasso')">Per incasso</button>
+      </div>
+      <div id="vt-bibite-body"></div>
+    </div>
+
+    <button class="giorni-toggle" id="gt-rist" onclick="toggleSection('gt-rist','gw-rist')" style="margin-top:4px">
+      <span>📅 Dettaglio giornaliero</span><span class="vtarrow">▼</span>
+    </button>
+    <div class="giorni-wrap" id="gw-rist">
+      ${buildGiorniTable(conDati)}
+    </div>
+  `;
+
+  // Popola tabelle vendite
+  window._vendite = vendite;
+  window._sortState = {piatti:'pezzi', bibite:'pezzi'};
+  renderVenditeTable('piatti', 'pezzi');
+  renderVenditeTable('bibite', 'pezzi');
+
+  // Chart ristorante
+  const c1 = new Chart(document.getElementById('ch-rist'), {
+    type:'bar',
+    data:{ labels:labG, datasets:[
+      {label:'2025', data:gG.map(g=>g.inc25), backgroundColor:C25+'99', borderColor:C25, borderWidth:1.5, borderRadius:4},
+      {label:'2026', data:gG.map(g=>g.inc26), backgroundColor:C26+'99', borderColor:C26, borderWidth:1.5, borderRadius:4}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#888',font:{size:9},autoSkip:false,maxRotation:45},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{ticks:{color:'#888',font:{size:9},callback:v=>'€'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,0.05)'}}
+      }}
+  });
+  charts.push(c1);
+
+  // ── OSTERIA & BAR ──
+  // Totali osteria dal CSV (colonne 22,23 sono LOTTERIA, non osteria!)
+  // Osteria è nelle righe vendite. Per KPI usiamo i totali della sezione osteria
+  const ostTot26 = vendite.ost.incasso.reduce((s,x)=>s+x.val,0);
+  const barTot26 = vendite.bar.incasso.reduce((s,x)=>s+x.val,0);
+  const ostTotPezzi26 = vendite.ost.pezzi.reduce((s,x)=>s+x.val,0);
+  const barTotPezzi26 = vendite.bar.pezzi.reduce((s,x)=>s+x.val,0);
+
+  document.getElementById('ost-content').innerHTML = `
+    <div class="data-banner">📅 Aggiornamento al <strong>${ultimaData}</strong></div>
+
+    <div class="sub-tabs">
+      <button class="sub-tab active" data-sub="osteria" onclick="switchSubTab('osteria')">🍷 Osteria</button>
+      <button class="sub-tab" data-sub="bar" onclick="switchSubTab('bar')">☕ Bar</button>
+    </div>
+
+    <!-- OSTERIA -->
+    <div id="ost-sub-osteria">
+      <div class="sez">Riepilogo osteria</div>
+      <div class="kpi-grid">
+        <div class="kpi wide">
+          <div class="kpi-label">Incassi Osteria 2026</div>
+          <div class="kpi-value">${fe(ostTot26)}</div>
+          <div class="kpi-diff neu">totale progressivo</div>
+        </div>
+        <div class="kpi wide">
+          <div class="kpi-label">Pezzi venduti</div>
+          <div class="kpi-value">${fn(ostTotPezzi26)}</div>
+          <div class="kpi-diff neu">totale progressivo</div>
+        </div>
+      </div>
+
+      <div class="sez">Riepilogo vendite osteria</div>
+      <button class="vendite-toggle" id="vt-ost-p" onclick="toggleSection('vt-ost-p','vw-ost-p')">
+        <span>Per pezzi venduti</span><span class="vtarrow">▼</span>
+      </button>
+      <div class="vendite-wrap" id="vw-ost-p">
+        ${buildVenditeTableSimple(vendite.ost.pezzi, 'pezzi')}
+      </div>
+      <button class="vendite-toggle" id="vt-ost-i" onclick="toggleSection('vt-ost-i','vw-ost-i')" style="margin-top:4px">
+        <span>Per incasso</span><span class="vtarrow">▼</span>
+      </button>
+      <div class="vendite-wrap" id="vw-ost-i">
+        ${buildVenditeTableSimple(vendite.ost.incasso, 'incasso')}
+      </div>
+    </div>
+
+    <!-- BAR -->
+    <div id="ost-sub-bar" style="display:none">
+      <div class="sez">Riepilogo bar</div>
+      <div class="kpi-grid">
+        <div class="kpi wide">
+          <div class="kpi-label">Incassi Bar 2026</div>
+          <div class="kpi-value">${fe(barTot26)}</div>
+          <div class="kpi-diff neu">totale progressivo</div>
+        </div>
+        <div class="kpi wide">
+          <div class="kpi-label">Pezzi venduti</div>
+          <div class="kpi-value">${fn(barTotPezzi26)}</div>
+          <div class="kpi-diff neu">totale progressivo</div>
+        </div>
+      </div>
+
+      <div class="sez">Riepilogo vendite bar</div>
+      <button class="vendite-toggle" id="vt-bar-p" onclick="toggleSection('vt-bar-p','vw-bar-p')">
+        <span>Per pezzi venduti</span><span class="vtarrow">▼</span>
+      </button>
+      <div class="vendite-wrap" id="vw-bar-p">
+        ${buildVenditeTableSimple(vendite.bar.pezzi, 'pezzi')}
+      </div>
+      <button class="vendite-toggle" id="vt-bar-i" onclick="toggleSection('vt-bar-i','vw-bar-i')" style="margin-top:4px">
+        <span>Per incasso</span><span class="vtarrow">▼</span>
+      </button>
+      <div class="vendite-wrap" id="vw-bar-i">
+        ${buildVenditeTableSimple(vendite.bar.incasso, 'incasso')}
+      </div>
+    </div>
+  `;
 }
 
-function toggleTabella() {
-  const btn = document.getElementById('tgl-btn');
-  const wrap = document.getElementById('tgl-wrap');
-  btn.classList.toggle('open');
-  wrap.classList.toggle('open');
+function buildVenditeTableSimple(items, tipo) {
+  if (!items||!items.length) return '<div style="padding:1rem;font-size:0.75rem;color:var(--muted);text-align:center">Nessun dato disponibile</div>';
+  const totale = items.reduce((s,x)=>s+x.val,0);
+  const fmt = tipo==='incasso' ? v=>fe(v) : v=>fn(v);
+  const rows = items.map((x,i)=>`
+    <tr>
+      <td><span class="rank rank-${i<3?i+1:'n'}">${i+1}</span>${x.nome}</td>
+      <td>${fmt(x.val)}</td>
+      <td style="color:var(--muted)">${totale>0?Math.round(x.val/totale*100)+'%':''}</td>
+    </tr>`).join('');
+  return `<table class="vtable">
+    <thead><tr><th>Prodotto</th><th>${tipo==='incasso'?'Incasso':'Pezzi'}</th><th>%</th></tr></thead>
+    <tbody>${rows}
+    <tr class="total-row"><td>Totale</td><td>${fmt(totale)}</td><td>100%</td></tr>
+    </tbody></table>`;
+}
+
+function renderVenditeTable(tipo, sort) {
+  const vendite = window._vendite;
+  if (!vendite) return;
+  const items = tipo==='piatti'
+    ? (sort==='pezzi' ? vendite.rist.pezzi : vendite.rist.incasso)
+    : (sort==='pezzi' ? vendite.bib.pezzi : vendite.bib.incasso);
+  const bodyId = tipo==='piatti' ? 'vt-piatti-body' : 'vt-bibite-body';
+  const el = document.getElementById(bodyId);
+  if (!el) return;
+  el.innerHTML = buildVenditeTableSimple(items, sort);
+  // Aggiorna sort tab attivo
+  const p = tipo==='piatti';
+  const sp = document.getElementById(p?'st-pezzi-p':'st-pezzi-b');
+  const si = document.getElementById(p?'st-inc-p':'st-inc-b');
+  if(sp){sp.classList.toggle('active',sort==='pezzi');}
+  if(si){si.classList.toggle('active',sort==='incasso');}
+}
+
+function sortVendite(tipo, sort) {
+  renderVenditeTable(tipo, sort);
+}
+
+function buildGiorniTable(giorni) {
+  const rows = giorni.map(g=>`
+    <tr>
+      <td>${g.label}</td>
+      <td>${fe(g.inc25)}</td>
+      <td>${fe(g.inc26)}</td>
+      <td class="${g.inc26!=null&&g.inc25!=null?(g.inc26-g.inc25>=0?'gdp':'gdn'):''}">
+        ${g.inc26!=null&&g.inc25!=null ? ds(g.inc26-g.inc25,fe) : '—'}
+      </td>
+      <td>${fn(g.cop26)}</td>
+      <td>${fe(g.sc26,2)}</td>
+    </tr>`).join('');
+  const tot25=giorni.reduce((s,g)=>s+(g.inc25||0),0);
+  const tot26=giorni.reduce((s,g)=>s+(g.inc26||0),0);
+  const cop26=giorni.reduce((s,g)=>s+(g.cop26||0),0);
+  return `<table class="gtable">
+    <thead><tr>
+      <th>Giorno</th><th>Inc 25</th><th>Inc 26</th><th>Diff</th><th>Cop</th><th>Sco</th>
+    </tr></thead>
+    <tbody>${rows}
+    <tr class="gtotal">
+      <td>Totale</td><td>${fe(tot25)}</td><td>${fe(tot26)}</td>
+      <td class="${tot26-tot25>=0?'gdp':'gdn'}">${ds(tot26-tot25,fe)}</td>
+      <td>${fn(cop26)}</td><td>—</td>
+    </tr>
+    </tbody></table>`;
+}
+
+// PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 
 caricaDati();
