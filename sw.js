@@ -1,4 +1,4 @@
-const CACHE = 'carteria-v1';
+const CACHE = 'carteria-v2';
 const ASSETS = [
   '/Carteria2026/',
   '/Carteria2026/index.html',
@@ -19,7 +19,6 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Per il CSV di Google Sheets vai sempre in rete (dati live)
   if (e.request.url.includes('docs.google.com')) {
     e.respondWith(fetch(e.request).catch(() => new Response('', {status: 503})));
     return;
