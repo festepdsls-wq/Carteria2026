@@ -397,7 +397,7 @@ function parseGiorni(rows) {
       cop25: num(r[11]), cop26: num(r[12]),
       sc25: num(r[18]), sc26: num(r[19]),
       lot25: num(r[22]), lot26: num(r[23]),
-      ost25: num(r[22]), ost26: num(r[23]) // nota: osteria e lotteria stessa col per ora
+      ostbar25: num(r[30]), ostbar26: num(r[31])
     });
   }
   // Ultima data con dati 2026
@@ -613,6 +613,15 @@ function renderAll(rows) {
   const ostTotPezzi26 = vendite.ost.pezzi.reduce((s,x)=>s+x.val,0);
   const barTotPezzi26 = vendite.bar.pezzi.reduce((s,x)=>s+x.val,0);
 
+  // Totali osteria+bar giornalieri (col 30=2025, 31=2026)
+  const ostbarConDati = conDati.filter(g=>g.ostbar26!=null&&g.ostbar26>0);
+  let ostbar25t=0, ostbar26t=0;
+  for (const g of ostbarConDati) {
+    ostbar26t += g.ostbar26||0;
+    if (g.ostbar25!=null) ostbar25t += g.ostbar25;
+  }
+  const dOstbar = ostbar26t - ostbar25t;
+
   const totGenerale26 = ostTot26 + barTot26;
   const pezziGenerale26 = ostTotPezzi26 + barTotPezzi26;
 
@@ -621,17 +630,22 @@ function renderAll(rows) {
 
     <div class="sez">Riepilogo generale osteria + bar</div>
     <div class="kpi-grid">
-      <div class="kpi wide pos-highlight">
+      <div class="kpi wide ${dOstbar>=0?'pos-highlight':'neg-highlight'}">
         <div class="kpi-label">Incassi totali Osteria &amp; Bar 2026</div>
         <div class="kpi-value">${fe(totGenerale26)}</div>
-        <div class="kpi-diff neu">osteria + bar</div>
+        <div class="kpi-diff ${dc(dOstbar)}">${ds(dOstbar,fe)} vs 2025</div>
       </div>
       <div class="kpi">
-        <div class="kpi-label">Osteria</div>
+        <div class="kpi-label">2025 (osteria+bar)</div>
+        <div class="kpi-value">${fe(ostbar25t)}</div>
+        <div class="kpi-diff neu">stesso periodo</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Osteria 2026</div>
         <div class="kpi-value">${fe(ostTot26)}</div>
       </div>
       <div class="kpi">
-        <div class="kpi-label">Bar</div>
+        <div class="kpi-label">Bar 2026</div>
         <div class="kpi-value">${fe(barTot26)}</div>
       </div>
 
@@ -676,7 +690,39 @@ function renderAll(rows) {
         ${buildVenditeTableSimple(vendite.bar.incasso, 'incasso')}
       </div>
     </div>
+
+    <div class="sez">Incassi giornalieri osteria &amp; bar</div>
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span><span class="ldot" style="background:#8b3030"></span>2025</span>
+        <span><span class="ldot" style="background:#1a6b3a"></span>2026</span>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="ch-ost"></canvas></div>
+    </div>
+
   `;
+
+  // Grafico osteria+bar
+  const ostbarG = conDati.filter(g => g.ostbar26 != null && g.ostbar26 > 0);
+  const labOst = ostbarG.map(g => g.label);
+  setTimeout(() => {
+    const el = document.getElementById('ch-ost');
+    if (el) {
+      const cOst = new Chart(el, {
+        type: 'bar',
+        data: { labels: labOst, datasets: [
+          { label:'2025', data: ostbarG.map(g=>g.ostbar25), backgroundColor:'#8b303099', borderColor:'#8b3030', borderWidth:1.5, borderRadius:4 },
+          { label:'2026', data: ostbarG.map(g=>g.ostbar26), backgroundColor:'#1a6b3a99', borderColor:'#1a6b3a', borderWidth:1.5, borderRadius:4 }
+        ]},
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+          scales:{
+            x:{ticks:{color:'#888',font:{size:9},autoSkip:false,maxRotation:45},grid:{color:'rgba(0,0,0,0.05)'}},
+            y:{ticks:{color:'#888',font:{size:9},callback:v=>'\u20ac'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,0.05)'}}
+          }}
+      });
+      charts.push(cOst);
+    }
+  }, 100);
 }
 
 function buildVenditeTableSimple(items, tipo) {
