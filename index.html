@@ -467,20 +467,29 @@ function parseVendite(rows) {
       const bvp_pezzi = num(r[3]);
       const bvi_nome = (r[5]||'').trim();
       const bvi_val = num(r[6]);
-      if (bvp_nome && !bvp_nome.toLowerCase().includes('totale') && !bvp_nome.toLowerCase().includes('descrizione') && bvp_pezzi!=null) {
+      if (bvp_nome && !bvp_nome.toLowerCase().includes('totale') && !bvp_nome.toLowerCase().includes('descrizione') && !bvp_nome.toLowerCase().includes('sum') && bvp_pezzi!=null) {
         bibPezzi.push({nome: bvp_nome, val: bvp_pezzi});
       }
-      if (bvi_nome && !bvi_nome.toLowerCase().includes('totale') && !bvi_nome.toLowerCase().includes('sum') && bvi_val!=null) {
+      if (bvi_nome && !bvi_nome.toLowerCase().includes('totale') && !bvi_nome.toLowerCase().includes('sum') && !bvi_nome.toLowerCase().includes('descrizione') && bvi_val!=null) {
         bibIncasso.push({nome: bvi_nome, val: bvi_val});
       }
     }
   }
 
+  function makeLookup(byPezzi, byIncasso) {
+    const lpz = {}; byPezzi.forEach(x => lpz[x.nome] = x.val);
+    const linc = {}; byIncasso.forEach(x => linc[x.nome] = x.val);
+    return { fromPezzi: linc, fromIncasso: lpz };
+  }
+  const lRist = makeLookup(ristPezzi, ristIncasso);
+  const lBib  = makeLookup(bibPezzi, bibIncasso);
+  const lOst  = makeLookup(ostPezzi, ostIncasso);
+  const lBar  = makeLookup(barPezzi, barIncasso);
   return {
-    rist: { pezzi: ristPezzi.sort((a,b)=>b.val-a.val), incasso: ristIncasso.sort((a,b)=>b.val-a.val) },
-    bib: { pezzi: bibPezzi.sort((a,b)=>b.val-a.val), incasso: bibIncasso.sort((a,b)=>b.val-a.val) },
-    ost: { pezzi: ostPezzi.sort((a,b)=>b.val-a.val), incasso: ostIncasso.sort((a,b)=>b.val-a.val) },
-    bar: { pezzi: barPezzi.sort((a,b)=>b.val-a.val), incasso: barIncasso.sort((a,b)=>b.val-a.val) }
+    rist: { pezzi: ristPezzi.sort((a,b)=>b.val-a.val), incasso: ristIncasso.sort((a,b)=>b.val-a.val), lkp: lRist },
+    bib:  { pezzi: bibPezzi.sort((a,b)=>b.val-a.val),  incasso: bibIncasso.sort((a,b)=>b.val-a.val),  lkp: lBib  },
+    ost:  { pezzi: ostPezzi.sort((a,b)=>b.val-a.val),  incasso: ostIncasso.sort((a,b)=>b.val-a.val),  lkp: lOst  },
+    bar:  { pezzi: barPezzi.sort((a,b)=>b.val-a.val),  incasso: barIncasso.sort((a,b)=>b.val-a.val),  lkp: lBar  }
   };
 }
 
@@ -660,13 +669,13 @@ function renderAll(rows) {
         <span>Per pezzi venduti</span><span class="vtarrow">▼</span>
       </button>
       <div class="vendite-wrap" id="vw-ost-p">
-        ${buildVenditeTableSimple(vendite.ost.pezzi, 'pezzi')}
+        ${buildVenditeTableSimple(vendite.ost.pezzi, 'pezzi', vendite.ost.lkp.fromPezzi)}
       </div>
       <button class="vendite-toggle" id="vt-ost-i" onclick="toggleSection('vt-ost-i','vw-ost-i')" style="margin-top:4px">
         <span>Per incasso</span><span class="vtarrow">▼</span>
       </button>
       <div class="vendite-wrap" id="vw-ost-i">
-        ${buildVenditeTableSimple(vendite.ost.incasso, 'incasso')}
+        ${buildVenditeTableSimple(vendite.ost.incasso, 'incasso', vendite.ost.lkp.fromIncasso)}
       </div>
     </div>
 
@@ -677,13 +686,13 @@ function renderAll(rows) {
         <span>Per pezzi venduti</span><span class="vtarrow">▼</span>
       </button>
       <div class="vendite-wrap" id="vw-bar-p">
-        ${buildVenditeTableSimple(vendite.bar.pezzi, 'pezzi')}
+        ${buildVenditeTableSimple(vendite.bar.pezzi, 'pezzi', vendite.bar.lkp.fromPezzi)}
       </div>
       <button class="vendite-toggle" id="vt-bar-i" onclick="toggleSection('vt-bar-i','vw-bar-i')" style="margin-top:4px">
         <span>Per incasso</span><span class="vtarrow">▼</span>
       </button>
       <div class="vendite-wrap" id="vw-bar-i">
-        ${buildVenditeTableSimple(vendite.bar.incasso, 'incasso')}
+        ${buildVenditeTableSimple(vendite.bar.incasso, 'incasso', vendite.bar.lkp.fromIncasso)}
       </div>
     </div>
 
@@ -721,33 +730,38 @@ function renderAll(rows) {
   }, 100);
 }
 
-function buildVenditeTableSimple(items, tipo) {
+function buildVenditeTableSimple(items, tipo, lookup) {
   if (!items||!items.length) return '<div style="padding:1rem;font-size:0.75rem;color:var(--muted);text-align:center">Nessun dato disponibile</div>';
   const totale = items.reduce((s,x)=>s+x.val,0);
   const fmt = tipo==='incasso' ? v=>fe(v) : v=>fn(v);
-  const rows = items.map((x,i)=>`
-    <tr>
+  const fmtAlt = tipo==='incasso' ? v=>fn(v) : v=>fe(v);
+  const colAlt = tipo==='incasso' ? 'Pezzi' : 'Incasso';
+  const rows = items.map((x,i)=>{
+    const altVal = lookup ? (lookup[x.nome] != null ? fmtAlt(lookup[x.nome]) : '—') : '';
+    return `<tr>
       <td><span class="rank rank-${i<3?i+1:'n'}">${i+1}</span>${x.nome}</td>
       <td>${fmt(x.val)}</td>
-      <td style="color:var(--muted)">${totale>0?Math.round(x.val/totale*100)+'%':''}</td>
-    </tr>`).join('');
+      <td style="color:var(--muted)">${altVal}</td>
+    </tr>`;
+  }).join('');
   return `<table class="vtable">
-    <thead><tr><th>Prodotto</th><th>${tipo==='incasso'?'Incasso':'Pezzi'}</th><th>%</th></tr></thead>
+    <thead><tr><th>Prodotto</th><th>${tipo==='incasso'?'Incasso':'Pezzi'}</th><th>${colAlt}</th></tr></thead>
     <tbody>${rows}
-    <tr class="total-row"><td>Totale</td><td>${fmt(totale)}</td><td>100%</td></tr>
+    <tr class="total-row"><td>Totale</td><td>${fmt(totale)}</td><td></td></tr>
     </tbody></table>`;
 }
 
 function renderVenditeTable(tipo, sort) {
   const vendite = window._vendite;
   if (!vendite) return;
-  const items = tipo==='piatti'
-    ? (sort==='pezzi' ? vendite.rist.pezzi : vendite.rist.incasso)
-    : (sort==='pezzi' ? vendite.bib.pezzi : vendite.bib.incasso);
-  const bodyId = tipo==='piatti' ? 'vt-piatti-body' : 'vt-bibite-body';
+  const isRist = tipo==='piatti';
+  const src = isRist ? vendite.rist : vendite.bib;
+  const items = sort==='pezzi' ? src.pezzi : src.incasso;
+  const lookup = sort==='pezzi' ? src.lkp.fromPezzi : src.lkp.fromIncasso;
+  const bodyId = isRist ? 'vt-piatti-body' : 'vt-bibite-body';
   const el = document.getElementById(bodyId);
   if (!el) return;
-  el.innerHTML = buildVenditeTableSimple(items, sort);
+  el.innerHTML = buildVenditeTableSimple(items, sort, lookup);
   // Aggiorna sort tab attivo
   const p = tipo==='piatti';
   const sp = document.getElementById(p?'st-pezzi-p':'st-pezzi-b');
