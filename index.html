@@ -16,6 +16,8 @@
   --rosso: #b22222;
   --rosso-scuro: #8b0000;
   --verde: #1a6b3a;
+  --azzurro-chiaro: #e8f4fd;
+  --azzurro: #2980b9;
   --verde-chiaro: #e6f4ec;
   --oro: #c8931a;
   --oro-chiaro: #fdf3dc;
@@ -122,6 +124,7 @@ main { padding: 0.75rem; max-width: 540px; margin: 0 auto; }
 .kpi.wide { grid-column: 1 / -1; }
 .kpi.pos-highlight { border-color: var(--verde); background: var(--verde-chiaro); }
 .kpi.neg-highlight { border-color: #e0c8c8; background: #fdf3f3; }
+.kpi.azzurro { border-color: #2980b9; background: #e8f4fd; }
 .kpi-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
 .kpi-value {
   font-family: 'Playfair Display', serif;
@@ -674,12 +677,12 @@ function renderAll(rows) {
 
     <div class="sez">Voci speciali</div>
     <div class="kpi-grid">
-      <div class="kpi ${vendite.quizzone.netto>0?'pos-highlight':''}">
+      <div class="kpi azzurro">
         <div class="kpi-label">🎯 Quizzone</div>
         <div class="kpi-value">${fe(vendite.quizzone.netto)}</div>
         <div class="kpi-diff neu">Iscr. ${fe(vendite.quizzone.iscrizioni)} · Menù ${fe(vendite.quizzone.menu)} · Buoni ${fe(vendite.quizzone.buoni)}</div>
       </div>
-      <div class="kpi">
+      <div class="kpi azzurro">
         <div class="kpi-label">🍺 Cauzione bicchieri</div>
         <div class="kpi-value">${fe(vendite.cauzione.incasso)}</div>
         <div class="kpi-diff ${vendite.cauzione.reso>0?'neg':'neu'}">${vendite.cauzione.reso>0?'Reso '+fe(vendite.cauzione.reso)+' · Saldo '+fe(vendite.cauzione.saldo):'Reso: in aggiornamento'}</div>
