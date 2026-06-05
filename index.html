@@ -476,6 +476,20 @@ function parseVendite(rows) {
     }
   }
 
+  // Quizzone (righe 102-105, col 12=label, 13=valore)
+  let quizIscrizioni=0, quizMenu=0, quizBuoni=0;
+  let cauzioneIncasso=0, cauzioneReso=0;
+  for (let i=101; i<rows.length; i++) {
+    const r = rows[i];
+    const label = (r[12]||'').trim().toUpperCase();
+    const val = num(r[13]);
+    if (label === 'ISCRIZIONI') quizIscrizioni = val||0;
+    if (label.includes('MENU') || label.includes('MENÙ') || label.includes('MEN')) quizMenu = val||0;
+    if (label === 'BUONI' || label.includes('BUONI')) quizBuoni = val||0;
+    if (label.includes('INCASSO CAUZ')) cauzioneIncasso = val||0;
+    if (label.includes('RESO CAUZ')) cauzioneReso = val||0;
+  }
+
   function makeLookup(byPezzi, byIncasso) {
     const lpz = {}; byPezzi.forEach(x => lpz[x.nome] = x.val);
     const linc = {}; byIncasso.forEach(x => linc[x.nome] = x.val);
@@ -489,7 +503,9 @@ function parseVendite(rows) {
     rist: { pezzi: ristPezzi.sort((a,b)=>b.val-a.val), incasso: ristIncasso.sort((a,b)=>b.val-a.val), lkp: lRist },
     bib:  { pezzi: bibPezzi.sort((a,b)=>b.val-a.val),  incasso: bibIncasso.sort((a,b)=>b.val-a.val),  lkp: lBib  },
     ost:  { pezzi: ostPezzi.sort((a,b)=>b.val-a.val),  incasso: ostIncasso.sort((a,b)=>b.val-a.val),  lkp: lOst  },
-    bar:  { pezzi: barPezzi.sort((a,b)=>b.val-a.val),  incasso: barIncasso.sort((a,b)=>b.val-a.val),  lkp: lBar  }
+    bar:  { pezzi: barPezzi.sort((a,b)=>b.val-a.val),  incasso: barIncasso.sort((a,b)=>b.val-a.val),  lkp: lBar  },
+    quizzone: { iscrizioni: quizIscrizioni, menu: quizMenu, buoni: quizBuoni, netto: quizIscrizioni+quizMenu+quizBuoni },
+    cauzione: { incasso: cauzioneIncasso, reso: cauzioneReso, saldo: cauzioneIncasso-cauzioneReso }
   };
 }
 
@@ -654,6 +670,20 @@ function renderAll(rows) {
         <div class="kpi-value">${fe(barTot26)}</div>
       </div>
 
+    </div>
+
+    <div class="sez">Voci speciali</div>
+    <div class="kpi-grid">
+      <div class="kpi ${vendite.quizzone.netto>0?'pos-highlight':''}">
+        <div class="kpi-label">🎯 Quizzone</div>
+        <div class="kpi-value">${fe(vendite.quizzone.netto)}</div>
+        <div class="kpi-diff neu">Iscr. ${fe(vendite.quizzone.iscrizioni)} · Menù ${fe(vendite.quizzone.menu)} · Buoni ${fe(vendite.quizzone.buoni)}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">🍺 Cauzione bicchieri</div>
+        <div class="kpi-value">${fe(vendite.cauzione.incasso)}</div>
+        <div class="kpi-diff ${vendite.cauzione.reso>0?'neg':'neu'}">${vendite.cauzione.reso>0?'Reso '+fe(vendite.cauzione.reso)+' · Saldo '+fe(vendite.cauzione.saldo):'Reso: in aggiornamento'}</div>
+      </div>
     </div>
 
     <div class="sez">Dettaglio per sezione</div>
