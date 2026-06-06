@@ -685,9 +685,12 @@ function renderAll(rows) {
         <div class="kpi-diff neu">Iscr. ${fe(vendite.quizzone.iscrizioni)} · Menù ${fe(vendite.quizzone.menu)} · Buoni ${fe(vendite.quizzone.buoni)}</div>
       </div>
       <div class="kpi azzurro">
-        <div class="kpi-label">🍺 Cauzione bicchieri</div>
-        <div class="kpi-value">${fe(vendite.cauzione.incasso)}</div>
-        <div class="kpi-diff ${vendite.cauzione.reso>0?'neg':'neu'}">${vendite.cauzione.reso>0?'-'+fe(vendite.cauzione.reso)+' · Saldo netto '+fe(vendite.cauzione.saldo):'Reso: in aggiornamento'}</div>
+        <div class="kpi-label">🍺 Cauzione bicchieri · saldo netto</div>
+        <div class="kpi-value">${fe(vendite.cauzione.saldo)}</div>
+        <div class="kpi-diff neu" style="margin-top:6px;line-height:1.8">
+          Incassi ${fe(vendite.cauzione.incasso)}<br>
+          Resi ${vendite.cauzione.reso>0?fe(vendite.cauzione.reso):'in aggiornamento'}
+        </div>
       </div>
     </div>
 
