@@ -492,7 +492,7 @@ function parseVendite(rows) {
     if (label.includes('MENU') || label.includes('MENÙ') || label.includes('MEN')) quizMenu = val||0;
     if (label === 'BUONI' || label.includes('BUONI')) quizBuoni = val||0;
     if (label.includes('INCASSO CAUZ')) cauzioneIncasso = val||0;
-    if (label.includes('RESO CAUZ')) cauzioneReso = val||0;
+    if (label.includes('RESO CAUZ')) cauzioneReso = val!=null ? Math.abs(val) : 0;
   }
 
   function makeLookup(byPezzi, byIncasso) {
@@ -687,7 +687,7 @@ function renderAll(rows) {
       <div class="kpi azzurro">
         <div class="kpi-label">🍺 Cauzione bicchieri</div>
         <div class="kpi-value">${fe(vendite.cauzione.incasso)}</div>
-        <div class="kpi-diff ${vendite.cauzione.reso>0?'neg':'neu'}">${vendite.cauzione.reso>0?'Reso '+fe(vendite.cauzione.reso)+' · Saldo '+fe(vendite.cauzione.saldo):'Reso: in aggiornamento'}</div>
+        <div class="kpi-diff ${vendite.cauzione.reso>0?'neg':'neu'}">${vendite.cauzione.reso>0?'-'+fe(vendite.cauzione.reso)+' · Saldo netto '+fe(vendite.cauzione.saldo):'Reso: in aggiornamento'}</div>
       </div>
     </div>
 
