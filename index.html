@@ -323,8 +323,10 @@ function num(v) {
   if (!v) return null;
   const s = v.trim();
   if (!s || ['#REF!','#N/A','#VALUE!'].includes(s) || s.toLowerCase()==='chiusi') return null;
-  let n = s.replace(/€/g,'').replace(/\s/g,'').replace(/\./g,'').replace(',','.');
+  const neg = s.startsWith('-') || s.startsWith('−');
+  let n = s.replace(/€/g,'').replace(/−/g,'').replace(/\s/g,'').replace(/\./g,'').replace(',','.');
   n = n.replace(/[^\d.\-]/g,'');
+  if (neg && !n.startsWith('-')) n = '-' + n;
   const f = parseFloat(n); return isNaN(f) ? null : f;
 }
 
