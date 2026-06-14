@@ -64,6 +64,18 @@ header {
   align-items: center; justify-content: center;
 }
 .btn-refresh.loading svg { animation: spin 1s linear infinite; }
+.header-totale {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 0.5rem 0.85rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+.header-totale .ht-label { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; margin-bottom: 2px; }
+.header-totale .ht-value { font-family: 'Playfair Display', serif; font-size: 1.3rem; line-height: 1; color: white; }
+.header-totale .ht-diff { font-size: 0.65rem; font-weight: 600; margin-top: 2px; }
+.ht-pos { color: #a8f0c6; } .ht-neg { color: #ffb3b3; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── TABS ── */
@@ -257,7 +269,13 @@ footer { text-align: center; font-size: 0.65rem; color: var(--muted); padding: 1
       <div class="logo-svg-wrap"><img src="CARTERIA_2026.svg" alt="Festa della Carteria 2026"></div>
       <div id="header-sub" style="font-size:0.65rem;opacity:0.8;margin-top:2px;"></div>
     </div>
-    <div class="header-right">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div class="header-totale" id="header-totale" style="display:none">
+        <div class="ht-label">Totale festa</div>
+        <div class="ht-value" id="ht-value">—</div>
+        <div class="ht-diff" id="ht-diff"></div>
+      </div>
+      <div class="header-right">
       <div class="update-time" id="last-update">—</div>
       <button class="btn-refresh" id="btnRefresh" onclick="caricaDati()" aria-label="Aggiorna">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -265,6 +283,7 @@ footer { text-align: center; font-size: 0.65rem; color: var(--muted); padding: 1
           <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
         </svg>
       </button>
+    </div>
     </div>
   </div>
   <div class="tabs">
@@ -538,6 +557,19 @@ function renderAll(rows) {
   const dLot=lot26t-lot25t;
 
   document.getElementById('header-sub').textContent = conDati.length + ' giorni · agg. al ' + ultimaData;
+
+  // Totale generale (ristorante + osteria+bar + lotteria)
+  const totGeneraleFesta = tot26 + ostbar26t + lot26;
+  const tot25GeneraleFesta = tot25 + ostbar25t + lot25t;
+  const diffGeneraleFesta = totGeneraleFesta - tot25GeneraleFesta;
+  const htEl = document.getElementById('header-totale');
+  if (htEl) {
+    htEl.style.display = 'block';
+    document.getElementById('ht-value').textContent = fe(totGeneraleFesta);
+    const diffEl = document.getElementById('ht-diff');
+    diffEl.textContent = (diffGeneraleFesta>=0?'▲ +':'▼ ') + fe(Math.abs(diffGeneraleFesta)) + ' vs 2025';
+    diffEl.className = 'ht-diff ' + (diffGeneraleFesta>=0?'ht-pos':'ht-neg');
+  }
 
   // ── RISTORANTE ──
   const C25='#8b3030', C26='#1a6b3a';
