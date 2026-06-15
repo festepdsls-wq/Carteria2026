@@ -1,4 +1,4 @@
-const CACHE = 'carteria-v21';
+const CACHE = 'carteria-v22';
 const ASSETS = [
   '/Carteria2026/',
   '/Carteria2026/index.html',

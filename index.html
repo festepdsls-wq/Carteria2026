@@ -403,7 +403,7 @@ async function caricaDati() {
 
 // ── PARSE DATA ──
 function parseGiorni(rows) {
-  const SKIP = ['','data','nel 2025','totale'];
+  const SKIP = ['','data','nel 2025','totale','nel 2024','2024','2025','2026'];
   const giorni = [];
   for (let i=8; i<rows.length; i++) {
     const r = rows[i];
@@ -665,7 +665,7 @@ function renderAll(rows) {
   const barTotPezzi26 = vendite.bar.pezzi.reduce((s,x)=>s+x.val,0);
 
   // Totali osteria+bar giornalieri (col 30=2025, 31=2026)
-  const ostbarConDati = conDati.filter(g=>g.ostbar26!=null&&g.ostbar26>0);
+  const ostbarConDati = conDati.filter(g=>g.ostbar26!=null&&g.ostbar26>0&&g.ostbar26<5000);
   let ostbar25t=0, ostbar26t=0;
   for (const g of ostbarConDati) {
     ostbar26t += g.ostbar26||0;
