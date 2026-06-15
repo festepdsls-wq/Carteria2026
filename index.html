@@ -664,12 +664,17 @@ function renderAll(rows) {
   const ostTotPezzi26 = vendite.ost.pezzi.reduce((s,x)=>s+x.val,0);
   const barTotPezzi26 = vendite.bar.pezzi.reduce((s,x)=>s+x.val,0);
 
-  // Totali osteria+bar giornalieri (col 30=2025, 31=2026)
-  const ostbarConDati = conDati.filter(g=>g.ostbar26!=null&&g.ostbar26>0&&g.ostbar26<5000);
+  // Totali osteria+bar: leggo dalla riga TOTALE (col AE=30, AF=31)
   let ostbar25t=0, ostbar26t=0;
-  for (const g of ostbarConDati) {
-    ostbar26t += g.ostbar26||0;
-    if (g.ostbar25!=null) ostbar25t += g.ostbar25;
+  for (let i=8; i<rows.length; i++) {
+    const r = rows[i];
+    if (!r || r.length < 32) continue;
+    const label = (r[1]||'').trim().toUpperCase();
+    if (label === 'TOTALE') {
+      ostbar25t = num(r[30]) || 0;
+      ostbar26t = num(r[31]) || 0;
+      break;
+    }
   }
   const dOstbar = ostbar26t - ostbar25t;
 
