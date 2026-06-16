@@ -550,8 +550,8 @@ function renderAll(rows) {
   // Lotteria 2025 somma sempre (per confronto)
   lot25t = conDati.reduce((s,g)=>s+(g.lot25||0),0);
 
-  const sc26m = cop26t>0?tot26/cop26t:null;
-  const sc25m = cop25t>0?tot25/cop25t:null;
+  const sc26m = sc26tot != null ? sc26tot : (cop26t>0?tot26/cop26t:null);
+  const sc25m = sc25tot != null ? sc25tot : (cop25t>0?tot25/cop25t:null);
   const dTot=tot26-tot25, dCop=cop26t-cop25t;
   const dSc=(sc26m&&sc25m)?sc26m-sc25m:null;
   const dLot=lot26t-lot25t;
@@ -664,15 +664,17 @@ function renderAll(rows) {
   const ostTotPezzi26 = vendite.ost.pezzi.reduce((s,x)=>s+x.val,0);
   const barTotPezzi26 = vendite.bar.pezzi.reduce((s,x)=>s+x.val,0);
 
-  // Totali osteria+bar: leggo dalla riga TOTALE (col AE=30, AF=31)
-  let ostbar25t=0, ostbar26t=0;
+  // Leggo dalla riga TOTALE: ostbar (AC/AD=28/29) e scontrino medio (S/T=18/19)
+  let ostbar25t=0, ostbar26t=0, sc25tot=null, sc26tot=null;
   for (let i=8; i<rows.length; i++) {
     const r = rows[i];
-    if (!r || r.length < 32) continue;
+    if (!r || r.length < 20) continue;
     const label = (r[1]||'').trim().toUpperCase();
     if (label === 'TOTALE') {
       ostbar25t = num(r[28]) || 0;
       ostbar26t = num(r[29]) || 0;
+      sc25tot = num(r[18]);
+      sc26tot = num(r[19]);
       break;
     }
   }
