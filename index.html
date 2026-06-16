@@ -421,7 +421,7 @@ function parseGiorni(rows) {
       cop25: num(r[11]), cop26: num(r[12]),
       sc25: num(r[18]), sc26: num(r[19]),
       lot25: num(r[22]), lot26: num(r[23]),
-      ostbar25: num(r[30]), ostbar26: num(r[31])
+      ostbar25: num(r[28]), ostbar26: num(r[29])
     });
   }
   // Ultima data con dati 2026
@@ -671,8 +671,8 @@ function renderAll(rows) {
     if (!r || r.length < 32) continue;
     const label = (r[1]||'').trim().toUpperCase();
     if (label === 'TOTALE') {
-      ostbar25t = num(r[30]) || 0;
-      ostbar26t = num(r[31]) || 0;
+      ostbar25t = num(r[28]) || 0;
+      ostbar26t = num(r[29]) || 0;
       break;
     }
   }
