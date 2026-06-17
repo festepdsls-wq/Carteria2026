@@ -890,9 +890,13 @@ function buildGiorniTable(giorni) {
     </tbody></table>`;
 }
 
-// PWA
+// PWA: disregistra tutto il vecchio, poi registra il nuovo
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
+  }).then(() => {
+    navigator.serviceWorker.register('sw.js?v=28').catch(()=>{});
+  });
 }
 
 caricaDati();
