@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitoraggio Pressione</title>
+<style>
+  :root{
+    --lavanda:#b9a6dd;
+    --lavanda-chiara:#e8e0f7;
+    --azzurro:#a8d4e8;
+    --azzurro-chiaro:#eaf5fa;
+    --rosa:#f2b6c6;
+    --rosa-chiaro:#fdeaf0;
+    --testo:#4a3f5c;
+    --testo-tenue:#8577a0;
+    --bianco:#fffdfe;
+    --ombra: 0 10px 30px -12px rgba(120,90,160,0.25);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(160deg, var(--lavanda-chiara) 0%, var(--azzurro-chiaro) 55%, var(--rosa-chiaro) 100%);
+    min-height:100vh;
+    color: var(--testo);
+    padding: 28px 16px 60px;
+  }
+
+  .contenitore{
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom: 24px;
+  }
+
+  header .cuore{
+    font-size: 34px;
+    display:inline-block;
+    margin-bottom: 4px;
+    animation: batti 2.2s ease-in-out infinite;
+  }
+
+  @keyframes batti{
+    0%,100%{ transform: scale(1); }
+    15%{ transform: scale(1.12); }
+    30%{ transform: scale(1); }
+  }
+
+  header h1{
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  header p{
+    font-size: 13px;
+    color: var(--testo-tenue);
+    margin-top: 2px;
+  }
+
+  .scheda{
+    background: var(--bianco);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: var(--ombra);
+    margin-bottom: 20px;
+  }
+
+  .scheda h2{
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--testo);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .griglia{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .campo{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .campo.pieno{
+    grid-column: 1 / -1;
+  }
+
+  label{
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--testo-tenue);
+  }
+
+  input{
+    border: 1.5px solid #e6ddf5;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 15px;
+    color: var(--testo);
+    background: #fbfaff;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    font-family: inherit;
+  }
+
+  input:focus{
+    border-color: var(--lavanda);
+    box-shadow: 0 0 0 3px rgba(185,166,221,0.25);
+  }
+
+  .riga-pressione{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  button#salva{
+    width:100%;
+    margin-top: 6px;
+    border:none;
+    border-radius: 14px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(120deg, var(--lavanda), var(--rosa));
+    cursor:pointer;
+    transition: transform .12s, opacity .12s;
+  }
+
+  button#salva:active{ transform: scale(0.98); }
+  button#salva:disabled{ opacity:0.6; cursor:default; }
+
+  .messaggio{
+    text-align:center;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 16px;
+    color: #7b9e4a;
+    font-weight: 600;
+  }
+
+  .elenco-intestazione{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 14px;
+  }
+
+  .conteggio{
+    font-size: 12px;
+    color: var(--testo-tenue);
+    background: var(--azzurro-chiaro);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-weight: 600;
+  }
+
+  .lettura{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 4px;
+    border-bottom: 1px solid #f0ecf9;
+    gap: 10px;
+  }
+
+  .lettura:last-child{ border-bottom:none; }
+
+  .lettura .quando{
+    display:flex;
+    flex-direction:column;
+    min-width: 78px;
+  }
+
+  .lettura .data-txt{
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--testo);
+  }
+
+  .lettura .ora-txt{
+    font-size: 12px;
+    color: var(--testo-tenue);
+  }
+
+  .valori{
+    display:flex;
+    gap: 8px;
+    flex:1;
+    justify-content:flex-end;
+  }
+
+  .pillola{
+    border-radius: 12px;
+    padding: 7px 12px;
+    text-align:center;
+    min-width: 62px;
+  }
+
+  .pillola .num{
+    font-size: 15px;
+    font-weight: 700;
+    display:block;
+  }
+
+  .pillola .lbl{
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .pillola.press{ background: var(--lavanda-chiara); color:#5f4b8a; }
+  .pillola.batt{ background: var(--rosa-chiaro); color:#b5567a; }
+
+  .elimina{
+    border:none;
+    background:none;
+    color:#cbb9e0;
+    font-size: 18px;
+    cursor:pointer;
+    padding: 4px 6px;
+    line-height:1;
+  }
+  .elimina:hover{ color:#c96a8a; }
+
+  .vuoto{
+    text-align:center;
+    color: var(--testo-tenue);
+    font-size: 13px;
+    padding: 30px 10px;
+  }
+
+  .vuoto .icona{
+    font-size: 28px;
+    display:block;
+    margin-bottom: 8px;
+  }
+
+  footer{
+    text-align:center;
+    font-size: 11px;
+    color: var(--testo-tenue);
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="contenitore">
+  <header>
+    <span class="cuore">💜</span>
+    <h1>Monitoraggio Pressione</h1>
+    <p>Registra pressione e battito in un attimo</p>
+  </header>
+
+  <div class="scheda">
+    <h2>➕ Nuova misurazione</h2>
+
+    <div class="griglia">
+      <div class="campo">
+        <label for="data">Data</label>
+        <input type="date" id="data">
+      </div>
+      <div class="campo">
+        <label for="ora">Ora</label>
+        <input type="time" id="ora">
+      </div>
+    </div>
+
+    <div class="campo pieno" style="margin-bottom:12px;">
+      <label>Pressione (mmHg)</label>
+      <div class="riga-pressione">
+        <input type="number" id="massima" placeholder="Massima" inputmode="numeric">
+        <input type="number" id="minima" placeholder="Minima" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="campo pieno" style="margin-bottom:6px;">
+      <label for="battito">Battito cardiaco (bpm)</label>
+      <input type="number" id="battito" placeholder="es. 72" inputmode="numeric">
+    </div>
+
+    <button id="salva">Salva misurazione</button>
+    <div class="messaggio" id="messaggio"></div>
+  </div>
+
+  <div class="scheda">
+    <div class="elenco-intestazione">
+      <h2 style="margin:0;">📋 Storico</h2>
+      <span class="conteggio" id="conteggio">0 letture</span>
+    </div>
+    <div id="elenco"></div>
+  </div>
+
+  <footer>I dati restano salvati solo su questo dispositivo</footer>
+</div>
+
+<script>
+const dataInput = document.getElementById('data');
+const oraInput = document.getElementById('ora');
+const massimaInput = document.getElementById('massima');
+const minimaInput = document.getElementById('minima');
+const battitoInput = document.getElementById('battito');
+const bottoneSalva = document.getElementById('salva');
+const messaggio = document.getElementById('messaggio');
+const elenco = document.getElementById('elenco');
+const conteggio = document.getElementById('conteggio');
+
+function impostaDataOraDefault(){
+  const ora = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  dataInput.value = `${ora.getFullYear()}-${pad(ora.getMonth()+1)}-${pad(ora.getDate())}`;
+  oraInput.value = `${pad(ora.getHours())}:${pad(ora.getMinutes())}`;
+}
+
+function formattaData(iso){
+  const [a,m,g] = iso.split('-');
+  return `${g}/${m}/${a}`;
+}
+
+async function caricaLetture(){
+  try{
+    const risultato = await window.storage.list('lettura:');
+    if(!risultato || !risultato.keys || risultato.keys.length === 0) return [];
+    const letture = [];
+    for(const k of risultato.keys){
+      try{
+        const r = await window.storage.get(k.key ? k.key : k);
+        if(r && r.value) letture.push(JSON.parse(r.value));
+      }catch(e){}
+    }
+    letture.sort((a,b) => (b.dataOra || '').localeCompare(a.dataOra || ''));
+    return letture;
+  }catch(e){
+    return [];
+  }
+}
+
+function disegnaLetture(letture){
+  conteggio.textContent = `${letture.length} lettur${letture.length === 1 ? 'a' : 'e'}`;
+
+  if(letture.length === 0){
+    elenco.innerHTML = `<div class="vuoto"><span class="icona">🌸</span>Nessuna misurazione ancora registrata</div>`;
+    return;
+  }
+
+  elenco.innerHTML = letture.map(l => `
+    <div class="lettura" data-id="${l.id}">
+      <div class="quando">
+        <span class="data-txt">${formattaData(l.data)}</span>
+        <span class="ora-txt">${l.ora}</span>
+      </div>
+      <div class="valori">
+        <div class="pillola press">
+          <span class="num">${l.massima}/${l.minima}</span>
+          <span class="lbl">mmHg</span>
+        </div>
+        <div class="pillola batt">
+          <span class="num">${l.battito}</span>
+          <span class="lbl">bpm</span>
+        </div>
+      </div>
+      <button class="elimina" data-id="${l.id}" title="Elimina">✕</button>
+    </div>
+  `).join('');
+
+  elenco.querySelectorAll('.elimina').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      try{
+        await window.storage.delete('lettura:' + id);
+        await aggiorna();
+      }catch(e){}
+    });
+  });
+}
+
+async function aggiorna(){
+  const letture = await caricaLetture();
+  disegnaLetture(letture);
+}
+
+bottoneSalva.addEventListener('click', async () => {
+  const data = dataInput.value;
+  const ora = oraInput.value;
+  const massima = massimaInput.value;
+  const minima = minimaInput.value;
+  const battito = battitoInput.value;
+
+  if(!data || !ora || !massima || !minima || !battito){
+    messaggio.style.color = '#c96a8a';
+    messaggio.textContent = 'Compila tutti i campi';
+    setTimeout(() => messaggio.textContent = '', 2000);
+    return;
+  }
+
+  bottoneSalva.disabled = true;
+  const id = Date.now().toString();
+  const voce = {
+    id,
+    data, ora,
+    dataOra: data + ' ' + ora,
+    massima: Number(massima),
+    minima: Number(minima),
+    battito: Number(battito)
+  };
+
+  try{
+    const risultato = await window.storage.set('lettura:' + id, JSON.stringify(voce));
+    if(!risultato) throw new Error('salvataggio fallito');
+
+    messaggio.style.color = '#7b9e4a';
+    messaggio.textContent = 'Misurazione salvata ✓';
+    setTimeout(() => messaggio.textContent = '', 2000);
+
+    massimaInput.value = '';
+    minimaInput.value = '';
+    battitoInput.value = '';
+    impostaDataOraDefault();
+
+    await aggiorna();
+  }catch(e){
+    messaggio.style.color = '#c96a8a';
+    messaggio.textContent = 'Errore nel salvataggio, riprova';
+  }finally{
+    bottoneSalva.disabled = false;
+  }
+});
+
+impostaDataOraDefault();
+aggiorna();
+</script>
+
+</body>
+</html>
